@@ -3,9 +3,12 @@ node_modules
 .pnp
 .pnp.js
 .yarn/install-state.gz
-.openagents-pitch
-prompt
-v1
+
+# private spec docs — kept locally as the source of truth, not pushed
+v1.md
+prompt.md
+openagents-pitch.md
+
 # next.js
 .next
 out
