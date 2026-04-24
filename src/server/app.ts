@@ -3,6 +3,7 @@ import { logger } from "hono/logger";
 import { cors } from "hono/cors";
 import { health } from "./routes/health";
 import { waitlist } from "./routes/waitlist";
+import { authRouter } from "./routes/auth";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -13,6 +14,7 @@ export const app = new Hono().basePath("/api");
 app.use("*", logger());
 app.use("*", cors());
 
+app.route("/auth", authRouter);
 app.route("/health", health);
 app.route("/waitlist", waitlist);
 
