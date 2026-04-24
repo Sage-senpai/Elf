@@ -1,5 +1,6 @@
 // Single barrel for Drizzle — drizzle.config.ts and the db client point here.
 export * from "./users";
+export * from "./auth";
 export * from "./workspaces";
 export * from "./projects";
 export * from "./forks";
