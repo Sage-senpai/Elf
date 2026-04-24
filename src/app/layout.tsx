@@ -1,0 +1,53 @@
+import type { Metadata } from "next";
+import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
+import "./globals.css";
+
+const display = DM_Serif_Display({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap"
+});
+
+const sans = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-sans",
+  display: "swap"
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
+  display: "swap"
+});
+
+export const metadata: Metadata = {
+  title: "elf — leave it to elf.",
+  description:
+    "Cross-functional builder workspace. Devs commit code, content contributors add docs, managers control access — without anyone leaving the platform.",
+  metadataBase: new URL("https://elf.so"),
+  openGraph: {
+    title: "elf — leave it to elf.",
+    description: "Every great product needs an elf.",
+    url: "https://elf.so",
+    siteName: "elf",
+    type: "website"
+  }
+};
+
+export default function RootLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html
+      lang="en"
+      className={`${display.variable} ${sans.variable} ${mono.variable}`}
+    >
+      <body>{children}</body>
+    </html>
+  );
+}

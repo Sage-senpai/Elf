@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* -------------------------------------------------------------------------- */
+/*  Elf brand — warm white surface, never pure white. Forest chrome.          */
+/*  Tokens here are duplicated in tailwind.config.ts so utility classes work. */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  --elf-forest: #0F3D2B;
+  --elf-deep: #0F6E56;
+  --elf-mid: #1D9E75;
+  --elf-mint: #9FE1CB;
+  --elf-warm-white: #F1EFE8;
+  --elf-ink: #2C2C2A;
+  --elf-muted: #5F5E5A;
+  --elf-border: #D3D1C7;
+  --elf-border-mid: #B4B2A9;
+}
+
+html,
+body {
+  background: var(--elf-warm-white);
+  color: var(--elf-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Brand rule: no font-weight 600 or 700, anywhere. Cap at 500. */
+* {
+  font-weight: inherit;
+}
+
+h1, h2, h3, h4, h5, h6,
+.heading {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.display {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.mono,
+code,
+pre {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-weight: 400;
+}
+
+/* Wordmark — always lowercase DM Serif Display */
+.wordmark {
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  text-transform: lowercase;
+  letter-spacing: -0.02em;
+}
+
+::selection {
+  background: var(--elf-mint);
+  color: var(--elf-forest);
+}
+
+/* Hairline borders — 0.5px, never shadows */
+.border-hair {
+  border-width: 0.5px;
+  border-style: solid;
+  border-color: var(--elf-border);
+}
+.border-hair:hover {
+  border-color: var(--elf-border-mid);
+}
