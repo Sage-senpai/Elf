@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { health } from "./routes/health";
 import { waitlist } from "./routes/waitlist";
 import { authRouter } from "./routes/auth";
+import { workspacesRouter } from "./routes/workspaces";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -17,6 +18,7 @@ app.use("*", cors());
 app.route("/auth", authRouter);
 app.route("/health", health);
 app.route("/waitlist", waitlist);
+app.route("/workspaces", workspacesRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 
