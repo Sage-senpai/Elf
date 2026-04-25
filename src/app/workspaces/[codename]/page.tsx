@@ -73,14 +73,23 @@ export default async function WorkspacePage({ params }: Props) {
                   : `${projects.length} projects`}
               </p>
             </div>
-            {projects.length > 0 && canCreate && (
+            <div className="flex items-center gap-2">
               <Button
-                href={`/workspaces/${workspace.codename}/projects/new`}
+                href={`/workspaces/${workspace.codename}/audit`}
+                variant="secondary"
                 size="md"
               >
-                New project
+                Audit log
               </Button>
-            )}
+              {projects.length > 0 && canCreate && (
+                <Button
+                  href={`/workspaces/${workspace.codename}/projects/new`}
+                  size="md"
+                >
+                  New project
+                </Button>
+              )}
+            </div>
           </div>
 
           {projects.length === 0 ? (
