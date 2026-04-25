@@ -5,6 +5,7 @@ import {
   type Project,
   type ProjectStatus
 } from "@/db/schema/projects";
+import { writeAuditEntry } from "@/lib/audit";
 
 /**
  * Repository for project reads/writes inside a workspace. Always scope by
@@ -48,6 +49,25 @@ export async function createProject(input: CreateProjectInput): Promise<Project>
         previewUrl: input.previewUrl ?? null
       })
       .returning();
+
+    // Fire-and-forget audit entry — same fail-soft contract as workspace.
+    void writeAuditEntry({
+      workspaceId: created.workspaceId,
+      projectId: created.id,
+      type: "project_created",
+      payload: {
+        slug: created.slug,
+        name: created.name,
+        owner_id: created.ownerId,
+        status: created.status,
+        github_repo: created.githubRepo,
+        stack: created.stack
+      }
+    }).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.warn("[audit] project_created entry failed:", err);
+    });
+
     return created;
   } catch (err) {
     // Postgres unique-constraint violation (workspace_id, slug)

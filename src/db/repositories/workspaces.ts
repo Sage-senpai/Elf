@@ -7,6 +7,7 @@ import {
   type Plan
 } from "@/db/schema/workspaces";
 import { generateUniqueCodename } from "@/lib/codename";
+import { writeAuditEntry } from "@/lib/audit";
 
 /**
  * Repository for workspace + membership reads/writes. Route handlers and
@@ -53,6 +54,22 @@ export async function createWorkspace(
     role: "manager",
     invitedBy: input.ownerId,
     joinedAt: new Date()
+  });
+
+  // Fire-and-forget audit entry. Failures here never block workspace
+  // creation — see writeAuditEntry's fail-soft contract.
+  void writeAuditEntry({
+    workspaceId: created.id,
+    type: "workspace_created",
+    payload: {
+      codename: created.codename,
+      display_name: created.displayName,
+      owner_id: created.ownerId,
+      github_org: created.githubOrg
+    }
+  }).catch((err) => {
+    // eslint-disable-next-line no-console
+    console.warn("[audit] workspace_created entry failed:", err);
   });
 
   return created;
