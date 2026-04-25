@@ -5,6 +5,7 @@ import { health } from "./routes/health";
 import { waitlist } from "./routes/waitlist";
 import { authRouter } from "./routes/auth";
 import { workspacesRouter } from "./routes/workspaces";
+import { projectsRouter } from "./routes/projects";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -19,6 +20,7 @@ app.route("/auth", authRouter);
 app.route("/health", health);
 app.route("/waitlist", waitlist);
 app.route("/workspaces", workspacesRouter);
+app.route("/workspaces/:codename/projects", projectsRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 
