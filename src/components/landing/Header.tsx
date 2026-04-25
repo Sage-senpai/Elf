@@ -15,17 +15,18 @@ export async function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8 text-sm text-elf-ink">
-          <Link href="#how" className="hover:text-elf-deep transition-colors">
+          <Link href="/#how" className="hover:text-elf-deep transition-colors">
             How it works
           </Link>
-          <a
-            href="https://github.com/Sage-senpai/Elf"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-elf-deep transition-colors"
-          >
-            GitHub
-          </a>
+          <Link href="/#use-cases" className="hover:text-elf-deep transition-colors">
+            Use cases
+          </Link>
+          <Link href="/#pricing" className="hover:text-elf-deep transition-colors">
+            Pricing
+          </Link>
+          <Link href="/#faq" className="hover:text-elf-deep transition-colors">
+            FAQ
+          </Link>
         </nav>
 
         {session ? (
