@@ -1,29 +1,29 @@
 type Layer = {
-  partner: string;
   layer: string;
+  title: string;
   body: string;
 };
 
 const layers: Layer[] = [
   {
-    partner: "0G Network",
-    layer: "agent memory + audit",
-    body: "0G Storage Log keeps every commit and fork approval as a tamper-proof, content-addressed record. 0G Storage KV holds live workspace state. 0G Compute runs the Shelf Agent's reasoning. The agent that watches your shelf, remembers everything, and never forgets."
+    layer: "permanent record",
+    title: "Your audit log outlives any platform.",
+    body: "Every commit, fork approval, and contributor payment is content-addressed and tamper-proof. If Elf disappeared tomorrow, your project history stays verifiable. We use 0G's permanent storage layer underneath — you'll never see it, but you'll feel it the day you need to prove what shipped, when, and who approved it."
   },
   {
-    partner: "Gensyn AXL",
-    layer: "encrypted P2P routing",
-    body: "Cowork sessions route through AXL's mesh — peer-to-peer, end-to-end encrypted, no central broker. A dev and a writer can collaborate live with the same Claude agent across separate networks."
+    layer: "encrypted collaboration",
+    title: "Your Cowork sessions don't pass through anyone.",
+    body: "Multi-party AI workspaces route through an encrypted peer-to-peer mesh. There's no central inbox watching your team think out loud. The dev, the writer, the manager, and the AI agent all talk on the same channel — privately, end-to-end, no third-party server in the middle."
   },
   {
-    partner: "KeeperHub",
     layer: "guaranteed execution",
-    body: "Fork approvals execute through KeeperHub with retries, audit trail, and on-chain settlement. The Shelf Agent pays for its own compute via x402 — no human in the loop, no silent failures."
+    title: "Your fork approvals can't fail silently.",
+    body: "When a manager approves a fork, the GitHub call runs through a guaranteed-execution layer with retries, full audit trail, and on-chain settlement. No more 'I approved it three days ago' / 'I never got it' confusion. Either it shipped, or you get a clear failure with a manual override."
   },
   {
-    partner: "Uniswap",
-    layer: "contributor payments",
-    body: "Each project gets an optional treasury on Base. When a manager approves a feat or content commit, the contributor gets paid in USDC — or any token they prefer, swapped through the Uniswap API."
+    layer: "trustless payments",
+    title: "Pay your contributors without invoices.",
+    body: "Project treasuries hold USDC. Approve a contributor's commit, they get paid — in USDC, ETH, or whatever they prefer. No invoicing dance, no payment processor delay, no exchange-rate fight. The contributor walks away with the money they earned, in the asset they wanted."
   }
 ];
 
@@ -33,30 +33,32 @@ export function Stack() {
       <div className="mx-auto max-w-shell">
         <div className="mb-16 max-w-prose">
           <p className="mono text-xs uppercase tracking-widest text-elf-mint mb-4">
-            the decentralized stack
+            built to last
           </p>
           <h2 className="display text-4xl md:text-5xl text-elf-mint leading-tight mb-4">
-            Centralized where it should be. Decentralized where it counts.
+            Infrastructure that outlives the platform.
           </h2>
           <p className="text-base md:text-lg text-elf-warm-white/80 leading-relaxed">
-            Built for ETHGlobal OpenAgents 2026. Four sponsors. Four layers.
-            One coherent architecture — every integration solves a real product
-            problem, not a demo one.
+            Most workspace tools are a single point of failure — if the
+            company shuts down, your team&apos;s history shuts down with it.
+            Elf is built differently. The parts that matter — your audit log,
+            your payments, your team&apos;s private conversations — don&apos;t
+            depend on us being around to read them back.
           </p>
         </div>
 
         <div className="grid gap-8 md:grid-cols-2">
           {layers.map((layer) => (
             <div
-              key={layer.partner}
+              key={layer.title}
               className="border border-hair border-elf-mint/20 rounded-card p-6 md:p-8"
             >
-              <div className="flex items-baseline justify-between mb-4 gap-4">
-                <h3 className="text-xl text-elf-mint">{layer.partner}</h3>
-                <span className="mono text-xs uppercase tracking-widest text-elf-warm-white/60">
-                  {layer.layer}
-                </span>
-              </div>
+              <p className="mono text-xs uppercase tracking-widest text-elf-warm-white/60 mb-4">
+                {layer.layer}
+              </p>
+              <h3 className="text-xl text-elf-mint mb-3 leading-snug">
+                {layer.title}
+              </h3>
               <p className="text-elf-warm-white/80 leading-relaxed">
                 {layer.body}
               </p>
