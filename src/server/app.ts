@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth";
 import { workspacesRouter } from "./routes/workspaces";
 import { projectsRouter } from "./routes/projects";
 import { commitsRouter } from "./routes/commits";
+import { treasuryRouter } from "./routes/treasury";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -23,6 +24,7 @@ app.route("/waitlist", waitlist);
 app.route("/workspaces", workspacesRouter);
 app.route("/workspaces/:codename/projects", projectsRouter);
 app.route("/workspaces/:codename/projects/:slug/commits", commitsRouter);
+app.route("/workspaces/:codename/projects/:slug/treasury", treasuryRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 
