@@ -8,6 +8,7 @@ import { createNotification } from "@/db/repositories/notifications";
 import { writeAuditEntry } from "@/lib/audit";
 import { writeActivity } from "@/db/repositories/activity";
 import { recordAgentRun } from "./contract";
+import { pickAgentInferenceProvider } from "@/lib/providers/inference";
 
 /**
  * Shelf Agent — the autonomous workspace monitor (spec section 15).
@@ -77,19 +78,26 @@ export async function runShelfAgent(
 
   const newlyStale = currentlyStale.filter((p) => !previouslyStale.has(p.id));
 
-  // 3. Notifications for newly-stale projects (don't re-spam the same owner).
+  // 3. Notifications for newly-stale projects (don't re-spam the same
+  //    owner). Body text is generated through the agent's inference
+  //    provider — 0G Compute when SHELF_AGENT_USE_0G_COMPUTE=true and
+  //    AGENT_WALLET_PRIVATE_KEY is set, Anthropic otherwise. Either
+  //    failure path falls back to a deterministic template so the
+  //    notification still lands.
   let notificationsSent = 0;
   for (const project of newlyStale) {
+    const body = await draftStaleNudge({
+      projectName: project.name,
+      thresholdDays,
+      lastSeen: project.lastSeen
+    });
     try {
       await createNotification({
         userId: project.ownerId,
         workspaceId: input.workspaceId,
         type: "agent.stale_project",
         title: `${project.name} has been quiet for ${thresholdDays}+ days`,
-        body:
-          `The Shelf Agent noticed no commits or content updates here ` +
-          `in the last ${thresholdDays} days. Drop a quick status — ` +
-          `even a chore commit clears the flag.`,
+        body,
         link: null
       });
       notificationsSent++;
@@ -168,6 +176,57 @@ export async function runShelfAgent(
     onChainTxHash: chain?.txHash ?? null,
     ranAt
   };
+}
+
+/**
+ * Generates the body of a stale-project nudge via the agent's inference
+ * provider. Falls back to a hand-written template if inference is
+ * unconfigured or fails — the notification always lands.
+ */
+async function draftStaleNudge(input: {
+  projectName: string;
+  thresholdDays: number;
+  lastSeen: Date | null;
+}): Promise<string> {
+  const fallback =
+    `The Shelf Agent noticed no commits or content updates on ` +
+    `${input.projectName} in the last ${input.thresholdDays} days. ` +
+    `Drop a quick status — even a chore commit clears the flag.`;
+
+  if (!process.env.ANTHROPIC_API_KEY && (process.env.SHELF_AGENT_USE_0G_COMPUTE ?? "").toLowerCase() !== "true") {
+    return fallback;
+  }
+
+  try {
+    const provider = pickAgentInferenceProvider();
+    const lastSeen = input.lastSeen
+      ? input.lastSeen.toISOString().slice(0, 10)
+      : "never";
+    const result = await provider.generate({
+      system:
+        "You are an autonomous workspace monitor. Write ONE short, " +
+        "warm, non-pushy sentence (max 220 chars) reminding the owner " +
+        "their project has been quiet. No greetings, no signoff, no " +
+        "emoji. Plain prose. Output the sentence only — no preamble.",
+      messages: [
+        {
+          role: "user",
+          content:
+            `Project: ${input.projectName}\n` +
+            `Days quiet (threshold): ${input.thresholdDays}\n` +
+            `Last activity date: ${lastSeen}\n\n` +
+            `Write the nudge.`
+        }
+      ],
+      maxTokens: 200
+    });
+    const text = result.content.trim();
+    return text.length > 0 ? text : fallback;
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.warn("[agent] inference failed, using template nudge:", err);
+    return fallback;
+  }
 }
 
 async function loadOrCreateState(workspaceId: string) {

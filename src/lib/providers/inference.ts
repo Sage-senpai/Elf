@@ -222,21 +222,174 @@ class AnthropicInferenceProvider implements InferenceProvider {
   }
 }
 
+/**
+ * Sealed inference on the 0G Compute Network. Used by the Shelf Agent so
+ * its reasoning runs on a decentralised provider, not on Anthropic. Pays
+ * out of the agent wallet's on-chain ZG balance via per-provider
+ * sub-accounts. Settlement is JWT-against-contract, not HTTP-402-per-
+ * request — we sign once per call and the provider claims usage later.
+ *
+ * Initialises the broker lazily on first call and reuses it for the
+ * lifetime of the process; getRequestHeaders is the slowest call in the
+ * loop (~100-300ms JWT sign), so we never want to re-init.
+ */
 class ZeroGComputeInferenceProvider implements InferenceProvider {
   readonly kind = "0g-compute" as const;
 
-  async generate(_req: InferenceRequest): Promise<InferenceResponse> {
-    // TODO: import { createZGComputeNetworkBroker } from '@0glabs/0g-serving-broker'
-    //       lands alongside the Shelf Agent itself.
-    throw new Error("ZeroGComputeInferenceProvider.generate not yet wired (sprint week 8).");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private brokerPromise: Promise<any> | null = null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async getBroker(): Promise<any> {
+    if (this.brokerPromise) return this.brokerPromise;
+    this.brokerPromise = (async () => {
+      if (!process.env.AGENT_WALLET_PRIVATE_KEY) {
+        throw new Error(
+          "AGENT_WALLET_PRIVATE_KEY not set — agent has no wallet to pay 0G Compute."
+        );
+      }
+      const rpc = process.env.ZG_EVM_RPC ?? "https://evmrpc-testnet.0g.ai";
+      const { ethers } = await import("ethers");
+      const { createZGComputeNetworkBroker } = await import("@0glabs/0g-serving-broker");
+      const provider = new ethers.JsonRpcProvider(rpc);
+      const wallet = new ethers.Wallet(
+        process.env.AGENT_WALLET_PRIVATE_KEY,
+        provider
+      );
+      // Factory derives ledger + inference contract addresses from the
+      // chain id — no need to pass them on testnet (16602).
+      return createZGComputeNetworkBroker(wallet);
+    })();
+    return this.brokerPromise;
   }
 
-  async *streamGenerate(_req: InferenceRequest): AsyncIterable<StreamEvent> {
-    yield {
-      type: "error",
-      message: "0G Compute streaming not yet wired."
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private async pickService(
+    broker: { inference: { listService: () => Promise<unknown[]>; acknowledgeProviderSigner: (a: string) => Promise<unknown>; getServiceMetadata: (a: string) => Promise<{ endpoint: string; model: string }> } },
+    preferredModel?: string
+  ): Promise<{ providerAddr: string; endpoint: string; model: string }> {
+    const services = (await broker.inference.listService()) as Array<{
+      provider: string;
+      model: string;
+      inputPrice: bigint;
+      outputPrice: bigint;
+    }>;
+    const candidates = preferredModel
+      ? services.filter((s) => s.model === preferredModel)
+      : services;
+    if (candidates.length === 0) {
+      throw new Error(
+        preferredModel
+          ? `No 0G Compute provider serves model "${preferredModel}".`
+          : "No 0G Compute providers available right now."
+      );
+    }
+    candidates.sort((a, b) =>
+      Number(a.inputPrice + a.outputPrice - (b.inputPrice + b.outputPrice))
+    );
+    const svc = candidates[0];
+
+    // Acknowledge once per provider — throws "already acknowledged" on
+    // every subsequent call, which is fine.
+    try {
+      await broker.inference.acknowledgeProviderSigner(svc.provider);
+    } catch {
+      /* already acknowledged */
+    }
+
+    const meta = await broker.inference.getServiceMetadata(svc.provider);
+    return { providerAddr: svc.provider, endpoint: meta.endpoint, model: meta.model };
+  }
+
+  async generate(req: InferenceRequest): Promise<InferenceResponse> {
+    const broker = await this.getBroker();
+    const { providerAddr, endpoint, model } = await this.pickService(
+      broker,
+      req.model
+    );
+
+    const messages = req.system
+      ? [{ role: "system" as const, content: req.system }, ...req.messages]
+      : req.messages;
+    const promptForAuth = messages.map((m) => m.content).join("\n");
+    const headers = await broker.inference.getRequestHeaders(
+      providerAddr,
+      promptForAuth
+    );
+
+    const res = await fetch(`${endpoint}/chat/completions`, {
+      method: "POST",
+      headers: { "content-type": "application/json", ...headers },
+      body: JSON.stringify({
+        model,
+        messages,
+        max_tokens: req.maxTokens ?? 512
+      })
+    });
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`0G Compute HTTP ${res.status}: ${text.slice(0, 200)}`);
+    }
+    const chatID = res.headers.get("ZG-Res-Key") ?? undefined;
+    const json = (await res.json()) as {
+      choices?: Array<{
+        message?: { content?: string };
+        finish_reason?: string;
+      }>;
+      usage?: Record<string, number>;
+    };
+
+    // Settle usage on-chain. Errors here don't fail the call — we
+    // already have the response.
+    try {
+      await broker.inference.processResponse(
+        providerAddr,
+        chatID,
+        JSON.stringify(json.usage ?? {})
+      );
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.warn("[0g-compute] processResponse failed:", err);
+    }
+
+    return {
+      content: json.choices?.[0]?.message?.content ?? "",
+      stopReason: json.choices?.[0]?.finish_reason ?? undefined,
+      inputTokens: json.usage?.prompt_tokens,
+      outputTokens: json.usage?.completion_tokens
     };
   }
+
+  /**
+   * Streaming via the OpenAI-compatible endpoint. Tool-use is NOT plumbed
+   * through here — Cowork uses Anthropic for that. The Shelf Agent uses
+   * generate() (single-turn), so this path is mainly for parity.
+   */
+  async *streamGenerate(req: InferenceRequest): AsyncIterable<StreamEvent> {
+    try {
+      const result = await this.generate(req);
+      if (result.content) yield { type: "text", delta: result.content };
+      yield { type: "done", stopReason: result.stopReason };
+    } catch (err) {
+      yield {
+        type: "error",
+        message: err instanceof Error ? err.message : "0G Compute failed."
+      };
+    }
+  }
+}
+
+/**
+ * Picks an inference provider based on env. The Shelf Agent calls this
+ * with explicit kind='0g-compute' when the user has opted in via
+ * SHELF_AGENT_USE_0G_COMPUTE=true; otherwise falls back to Anthropic so
+ * the agent always has a way to think.
+ */
+export function pickAgentInferenceProvider(): InferenceProvider {
+  const wantsZg =
+    (process.env.SHELF_AGENT_USE_0G_COMPUTE ?? "").toLowerCase() === "true" &&
+    !!process.env.AGENT_WALLET_PRIVATE_KEY;
+  return getInferenceProvider(wantsZg ? "0g-compute" : "anthropic");
 }
 
 export function getInferenceProvider(
