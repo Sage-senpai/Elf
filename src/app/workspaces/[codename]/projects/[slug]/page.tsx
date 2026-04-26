@@ -5,6 +5,7 @@ import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/Button";
 import { CommitList } from "@/components/commits/CommitList";
 import { CoworkLauncher } from "@/components/cowork/CoworkLauncher";
+import { GithubLinkCard } from "@/components/github/GithubLinkCard";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -169,20 +170,12 @@ export default async function ProjectPage({ params }: Props) {
                 )}
               </DetailCard>
 
-              <DetailCard title="GitHub">
-                {project.githubRepo ? (
-                  <a
-                    href={`https://github.com/${project.githubRepo}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mono text-sm text-elf-deep underline underline-offset-2 break-all"
-                  >
-                    {project.githubRepo}
-                  </a>
-                ) : (
-                  <p className="text-sm text-elf-muted">No repo linked yet.</p>
-                )}
-              </DetailCard>
+              <GithubLinkCard
+                codename={workspace.codename}
+                slug={project.slug}
+                initialRepo={project.githubRepo}
+                canEdit={role === "manager" || role === "dev"}
+              />
 
               <DetailCard title="Preview">
                 {project.previewUrl ? (
