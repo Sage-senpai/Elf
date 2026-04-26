@@ -95,6 +95,13 @@ export default async function WorkspacePage({ params }: Props) {
               >
                 Audit log
               </Button>
+              <Button
+                href={`/workspaces/${workspace.codename}/agent`}
+                variant="secondary"
+                size="md"
+              >
+                Agent
+              </Button>
               {projects.length > 0 && canCreate && (
                 <Button
                   href={`/workspaces/${workspace.codename}/projects/new`}

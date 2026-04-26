@@ -10,6 +10,7 @@ import { commitsRouter } from "./routes/commits";
 import { treasuryRouter } from "./routes/treasury";
 import { coworkRouter } from "./routes/cowork";
 import { githubRouter, projectGithubRouter } from "./routes/github";
+import { agentRouter } from "./routes/agent";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -30,6 +31,7 @@ app.route("/workspaces/:codename/projects/:slug/treasury", treasuryRouter);
 app.route("/workspaces/:codename/projects/:slug/cowork", coworkRouter);
 app.route("/github", githubRouter);
 app.route("/workspaces/:codename/projects/:slug/github", projectGithubRouter);
+app.route("/workspaces/:codename/agent", agentRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 
