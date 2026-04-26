@@ -4,6 +4,7 @@ import { Logo } from "@/components/brand/Logo";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/Button";
 import { CommitList } from "@/components/commits/CommitList";
+import { CoworkLauncher } from "@/components/cowork/CoworkLauncher";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -211,6 +212,8 @@ export default async function ProjectPage({ params }: Props) {
           </div>
         </div>
       </section>
+
+      <CoworkLauncher codename={workspace.codename} slug={project.slug} />
     </main>
   );
 }
