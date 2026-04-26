@@ -131,6 +131,21 @@ export async function findProjectBySlug(
 }
 
 /**
+ * Link or unlink a GitHub repo on a project. Pass null to unlink.
+ */
+export async function setProjectGithubRepo(
+  projectId: string,
+  githubRepo: string | null
+): Promise<Project | null> {
+  const [updated] = await db
+    .update(projects)
+    .set({ githubRepo, updatedAt: new Date() })
+    .where(eq(projects.id, projectId))
+    .returning();
+  return updated ?? null;
+}
+
+/**
  * Slugify a freeform project name into a URL-safe slug.
  *   "My First Project!"  ->  "my-first-project"
  * Caller is responsible for collision retries (append -2, -3, etc.).
