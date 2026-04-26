@@ -88,14 +88,23 @@ export default async function ProjectPage({ params }: Props) {
                 </p>
               )}
             </div>
-            <span
-              className={cn(
-                "shrink-0 mono text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-badge",
-                statusTone[project.status] ?? statusTone.concept
-              )}
-            >
-              {statusLabel[project.status] ?? project.status}
-            </span>
+            <div className="flex items-center gap-3 flex-wrap">
+              <span
+                className={cn(
+                  "shrink-0 mono text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-badge",
+                  statusTone[project.status] ?? statusTone.concept
+                )}
+              >
+                {statusLabel[project.status] ?? project.status}
+              </span>
+              <Button
+                href={`/workspaces/${workspace.codename}/projects/${project.slug}/treasury`}
+                variant="secondary"
+                size="md"
+              >
+                Treasury
+              </Button>
+            </div>
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
