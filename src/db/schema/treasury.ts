@@ -27,7 +27,12 @@ export const projectTreasuries = pgTable(
       .notNull()
       .references(() => projects.id, { onDelete: "cascade" }),
     walletAddress: text("wallet_address").notNull(),
-    chainId: integer("chain_id").notNull().default(8453),
+    // AES-256-GCM ciphertext of the treasury's private key. Format:
+    //   base64(iv) + ":" + base64(tag) + ":" + base64(ciphertext)
+    // Decryption keyed by ENCRYPTION_KEY env var. NEVER log or surface.
+    encryptedPrivateKey: text("encrypted_private_key").notNull(),
+    // Base mainnet (8453) or Base Sepolia (84532).
+    chainId: integer("chain_id").notNull().default(84532),
     usdcBalance: numeric("usdc_balance", { precision: 20, scale: 6 }).default("0"),
     totalDisbursed: numeric("total_disbursed", { precision: 20, scale: 6 }).default("0"),
     createdAt: timestamp("created_at", { withTimezone: true })
