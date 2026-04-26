@@ -4,12 +4,15 @@ import { Logo } from "@/components/brand/Logo";
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/Button";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
+import { ActivityFeed } from "@/components/activity/ActivityFeed";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
   getUserRole
 } from "@/db/repositories/workspaces";
 import { listProjects } from "@/db/repositories/projects";
+import { listWorkspaceActivity } from "@/db/repositories/activity";
+import { findUsersById } from "@/db/repositories/users";
 
 type Props = {
   params: { codename: string };
@@ -28,6 +31,10 @@ export default async function WorkspacePage({ params }: Props) {
   if (!role) notFound();
 
   const projects = await listProjects(workspace.id);
+  const recentActivity = await listWorkspaceActivity(workspace.id, 6);
+  const activityAuthors = await findUsersById(
+    recentActivity.map((a) => a.actorId).filter((x): x is string => !!x)
+  );
   const canCreate = role !== "viewer";
 
   return (
@@ -73,7 +80,14 @@ export default async function WorkspacePage({ params }: Props) {
                   : `${projects.length} projects`}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Button
+                href={`/workspaces/${workspace.codename}/activity`}
+                variant="secondary"
+                size="md"
+              >
+                Activity
+              </Button>
               <Button
                 href={`/workspaces/${workspace.codename}/audit`}
                 variant="secondary"
@@ -96,6 +110,32 @@ export default async function WorkspacePage({ params }: Props) {
             <EmptyShelf workspaceCodename={workspace.codename} canCreate={canCreate} />
           ) : (
             <ProjectGrid workspaceCodename={workspace.codename} projects={projects} />
+          )}
+
+          {recentActivity.length > 0 && (
+            <div className="mt-16 pt-12 border-t border-hair">
+              <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
+                <div>
+                  <p className="mono text-xs uppercase tracking-widest text-elf-mid mb-2">
+                    workspace heartbeat
+                  </p>
+                  <h2 className="display text-2xl text-elf-forest leading-tight">
+                    Latest activity
+                  </h2>
+                </div>
+                <Link
+                  href={`/workspaces/${workspace.codename}/activity`}
+                  className="text-sm text-elf-deep hover:text-elf-forest underline underline-offset-2"
+                >
+                  See all activity →
+                </Link>
+              </div>
+              <ActivityFeed
+                workspaceCodename={workspace.codename}
+                activity={recentActivity}
+                authorById={activityAuthors}
+              />
+            </div>
           )}
         </div>
       </section>
