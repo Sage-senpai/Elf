@@ -1,0 +1,10 @@
+# Foundry build output
+out/
+cache/
+broadcast/
+
+# Foundry libs are git-submodule territory; commit only what we wrote
+lib/
+
+# Local deploy receipts
+deployments/
