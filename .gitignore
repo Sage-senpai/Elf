@@ -43,7 +43,8 @@ next-env.d.ts
 # drizzle
 drizzle/migrations/meta/_journal.json.bak
 
-# editors
+# editors / local agent settings
 .vscode/*
 !.vscode/extensions.json
 .idea
+.claude/
