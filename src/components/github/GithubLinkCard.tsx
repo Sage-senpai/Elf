@@ -42,22 +42,25 @@ export function GithubLinkCard({ codename, slug, initialRepo, canEdit }: Props) 
             {linked}
           </a>
           {canEdit && (
-            <div className="mt-3 flex gap-2 flex-wrap">
-              <button
-                type="button"
-                onClick={() => setPickerOpen(true)}
-                className="text-xs text-elf-muted hover:text-elf-deep underline underline-offset-2"
-              >
-                change
-              </button>
-              <UnlinkButton
-                codename={codename}
-                slug={slug}
-                onUnlinked={() => {
-                  setLinked(null);
-                  router.refresh();
-                }}
-              />
+            <div className="mt-4 space-y-3">
+              <SyncButton codename={codename} slug={slug} onSynced={() => router.refresh()} />
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  type="button"
+                  onClick={() => setPickerOpen(true)}
+                  className="text-xs text-elf-muted hover:text-elf-deep underline underline-offset-2"
+                >
+                  change
+                </button>
+                <UnlinkButton
+                  codename={codename}
+                  slug={slug}
+                  onUnlinked={() => {
+                    setLinked(null);
+                    router.refresh();
+                  }}
+                />
+              </div>
             </div>
           )}
         </div>
@@ -89,6 +92,86 @@ export function GithubLinkCard({ codename, slug, initialRepo, canEdit }: Props) 
         />
       )}
     </div>
+  );
+}
+
+function SyncButton({
+  codename,
+  slug,
+  onSynced
+}: {
+  codename: string;
+  slug: string;
+  onSynced: () => void;
+}) {
+  const [pending, startTransition] = useTransition();
+  const [result, setResult] = useState<string | null>(null);
+
+  function trigger() {
+    startTransition(async () => {
+      setResult(null);
+      try {
+        const res = await fetch(
+          `/api/workspaces/${codename}/projects/${slug}/github/sync`,
+          { method: "POST" }
+        );
+        const json = (await res.json()) as {
+          imported?: number;
+          skipped?: number;
+          message?: string;
+        };
+        if (!res.ok) {
+          setResult(json.message ?? "Sync failed.");
+          return;
+        }
+        setResult(
+          json.imported === 0
+            ? "Already up to date."
+            : `Imported ${json.imported} commit${json.imported === 1 ? "" : "s"}.`
+        );
+        onSynced();
+      } catch (err) {
+        setResult(err instanceof Error ? err.message : "Network error.");
+      }
+    });
+  }
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={trigger}
+        disabled={pending}
+        className="text-sm inline-flex items-center gap-1.5 text-elf-deep hover:text-elf-forest disabled:opacity-60"
+      >
+        <SyncIcon spinning={pending} />
+        {pending ? "Syncing…" : "Sync recent commits from GitHub"}
+      </button>
+      {result && (
+        <p className="text-xs text-elf-muted mt-1.5">{result}</p>
+      )}
+    </div>
+  );
+}
+
+function SyncIcon({ spinning }: { spinning: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={spinning ? "animate-spin" : ""}
+      aria-hidden="true"
+    >
+      <polyline points="23 4 23 10 17 10" />
+      <polyline points="1 20 1 14 7 14" />
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+    </svg>
   );
 }
 

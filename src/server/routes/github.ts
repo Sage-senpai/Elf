@@ -9,6 +9,7 @@ import {
   listRecentCommits
 } from "@/lib/github/client";
 import { setProjectGithubRepo } from "@/db/repositories/projects";
+import { syncGithubCommits } from "@/lib/github/sync";
 
 /**
  * Mounted at:
@@ -110,4 +111,26 @@ export const projectGithubRouter = new Hono()
     }
     const updated = await setProjectGithubRepo(c.var.project.id, null);
     return c.json({ project: updated });
+  })
+  .post("/sync", async (c) => {
+    if (c.var.workspaceRole === "viewer" || c.var.workspaceRole === "content") {
+      return c.json({ error: "forbidden", reason: "manager_or_dev_only" }, 403);
+    }
+    const repo = c.var.project.githubRepo;
+    if (!repo) return c.json({ error: "not_linked" }, 400);
+    try {
+      const result = await syncGithubCommits({
+        workspaceId: c.var.workspace.id,
+        projectId: c.var.project.id,
+        authorId: c.var.userId,
+        repo,
+        userId: c.var.userId
+      });
+      return c.json(result);
+    } catch (err) {
+      if (err instanceof GithubError) {
+        return c.json({ error: "github", status: err.status, message: err.message }, 502);
+      }
+      throw err;
+    }
   });
