@@ -2,12 +2,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { Button } from "@/components/ui/Button";
+import { CommitList } from "@/components/commits/CommitList";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
   getUserRole
 } from "@/db/repositories/workspaces";
 import { findProjectBySlug } from "@/db/repositories/projects";
+import { listProjectCommits } from "@/db/repositories/commits";
+import { findUsersById } from "@/db/repositories/users";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -42,6 +46,10 @@ export default async function ProjectPage({ params }: Props) {
 
   const project = await findProjectBySlug(workspace.id, params.slug);
   if (!project) notFound();
+
+  const commits = await listProjectCommits(project.id, 30);
+  const authors = await findUsersById(commits.map((c) => c.authorId));
+  const canCommit = role !== "viewer";
 
   return (
     <main className="min-h-screen">
@@ -91,21 +99,46 @@ export default async function ProjectPage({ params }: Props) {
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div className="border-hair rounded-card p-8">
-              <p className="mono text-xs uppercase tracking-widest text-elf-mid mb-3">
-                no commits yet
-              </p>
-              <h2 className="text-xl text-elf-forest mb-2">Push the first commit.</h2>
-              <p className="text-sm text-elf-muted leading-relaxed mb-6">
-                Once you start committing — code commits from your linked
-                repo or content commits from contributors — they&apos;ll
-                appear here in plain English. Every commit also becomes a
-                tamper-proof entry in this project&apos;s permanent audit log.
-              </p>
-              <p className="text-xs text-elf-muted">
-                Commit form is coming next sprint. Linking GitHub means
-                pushes from the linked repo will auto-appear here.
-              </p>
+            <div>
+              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                <h2 className="text-lg text-elf-forest">
+                  {commits.length === 0
+                    ? "No commits yet"
+                    : commits.length === 1
+                      ? "1 commit"
+                      : `${commits.length} commits`}
+                </h2>
+                {canCommit && (
+                  <Button
+                    href={`/workspaces/${workspace.codename}/projects/${project.slug}/commits/new`}
+                    size="md"
+                  >
+                    New commit
+                  </Button>
+                )}
+              </div>
+
+              {commits.length === 0 ? (
+                <div className="border-hair rounded-card p-8">
+                  <p className="text-sm text-elf-muted leading-relaxed mb-3">
+                    Once you commit — a feature, a fix, a content draft —
+                    it lands here in plain English. Every commit also becomes
+                    a tamper-proof entry in this project&apos;s permanent
+                    audit log.
+                  </p>
+                  {canCommit ? (
+                    <p className="text-xs text-elf-muted">
+                      Click &ldquo;New commit&rdquo; above to record your first.
+                    </p>
+                  ) : (
+                    <p className="text-xs text-elf-muted">
+                      Viewers can&apos;t author commits — ask a manager or dev to write the first.
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <CommitList commits={commits} authorById={authors} />
+              )}
             </div>
 
             <aside className="space-y-6">
