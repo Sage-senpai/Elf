@@ -6,6 +6,7 @@ import {
   type ProjectStatus
 } from "@/db/schema/projects";
 import { writeAuditEntry } from "@/lib/audit";
+import { writeActivity } from "./activity";
 
 /**
  * Repository for project reads/writes inside a workspace. Always scope by
@@ -66,6 +67,17 @@ export async function createProject(input: CreateProjectInput): Promise<Project>
     }).catch((err) => {
       // eslint-disable-next-line no-console
       console.warn("[audit] project_created entry failed:", err);
+    });
+
+    void writeActivity({
+      workspaceId: created.workspaceId,
+      projectId: created.id,
+      actorId: created.ownerId,
+      type: "project.created",
+      payload: { slug: created.slug, name: created.name, status: created.status }
+    }).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.warn("[activity] project.created failed:", err);
     });
 
     return created;

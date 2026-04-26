@@ -8,6 +8,7 @@ import {
 } from "@/db/schema/workspaces";
 import { generateUniqueCodename } from "@/lib/codename";
 import { writeAuditEntry } from "@/lib/audit";
+import { writeActivity } from "./activity";
 
 /**
  * Repository for workspace + membership reads/writes. Route handlers and
@@ -70,6 +71,16 @@ export async function createWorkspace(
   }).catch((err) => {
     // eslint-disable-next-line no-console
     console.warn("[audit] workspace_created entry failed:", err);
+  });
+
+  void writeActivity({
+    workspaceId: created.id,
+    actorId: created.ownerId,
+    type: "workspace.created",
+    payload: { codename: created.codename, display_name: created.displayName }
+  }).catch((err) => {
+    // eslint-disable-next-line no-console
+    console.warn("[activity] workspace.created failed:", err);
   });
 
   return created;

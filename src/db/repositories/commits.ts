@@ -7,6 +7,7 @@ import {
   commitTypeValues
 } from "@/db/schema/projects";
 import { writeAuditEntry } from "@/lib/audit";
+import { writeActivity } from "./activity";
 
 /**
  * Commit repository — Elf's commit log lives in Postgres and mirrors to
@@ -65,6 +66,23 @@ export async function createCommit(input: CreateCommitInput): Promise<Commit> {
   }).catch((err) => {
     // eslint-disable-next-line no-console
     console.warn("[audit] commit_created entry failed:", err);
+  });
+
+  void writeActivity({
+    workspaceId: created.workspaceId,
+    projectId: created.projectId,
+    actorId: created.authorId,
+    type: "commit.created",
+    payload: {
+      commit_id: created.id,
+      type: created.type,
+      scope: created.scope,
+      summary: created.summary,
+      is_breaking: created.isBreaking
+    }
+  }).catch((err) => {
+    // eslint-disable-next-line no-console
+    console.warn("[activity] commit.created failed:", err);
   });
 
   return created;
