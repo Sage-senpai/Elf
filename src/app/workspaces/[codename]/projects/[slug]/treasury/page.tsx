@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { HeaderActions } from "@/components/auth/HeaderActions";
 import { Button } from "@/components/ui/Button";
 import { requireSession } from "@/lib/auth/session";
 import {
@@ -136,7 +136,7 @@ function Shell({
             <span className="text-elf-border">/</span>
             <span className="mono text-sm text-elf-ink">treasury</span>
           </Link>
-          <UserMenu user={session.user} />
+          <HeaderActions user={session.user} />
         </div>
       </header>
 

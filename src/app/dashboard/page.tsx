@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { HeaderActions } from "@/components/auth/HeaderActions";
 import { Button } from "@/components/ui/Button";
 import { requireSession } from "@/lib/auth/session";
 import { listWorkspacesForUser } from "@/db/repositories/workspaces";
@@ -20,7 +20,7 @@ export default async function DashboardPage() {
           <Link href="/" className="flex items-center" aria-label="elf home">
             <Logo size={28} />
           </Link>
-          <UserMenu
+          <HeaderActions
             user={{
               name: session.user.name,
               email: session.user.email,

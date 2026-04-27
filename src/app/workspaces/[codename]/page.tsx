@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { HeaderActions } from "@/components/auth/HeaderActions";
 import { Button } from "@/components/ui/Button";
 import { ProjectGrid } from "@/components/projects/ProjectGrid";
 import { ActivityFeed } from "@/components/activity/ActivityFeed";
@@ -46,7 +46,7 @@ export default async function WorkspacePage({ params }: Props) {
             <span className="text-elf-border">/</span>
             <span className="mono text-sm text-elf-ink">{workspace.codename}</span>
           </Link>
-          <UserMenu
+          <HeaderActions
             user={{
               name: session.user.name,
               email: session.user.email,

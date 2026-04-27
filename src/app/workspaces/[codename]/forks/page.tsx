@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
-import { UserMenu } from "@/components/auth/UserMenu";
+import { HeaderActions } from "@/components/auth/HeaderActions";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -59,7 +59,7 @@ export default async function ForksPage({ params }: Props) {
             <span className="text-elf-border">/</span>
             <span className="mono text-sm text-elf-ink">forks</span>
           </Link>
-          <UserMenu user={session.user} />
+          <HeaderActions user={session.user} />
         </div>
       </header>
 
