@@ -102,6 +102,13 @@ export default async function WorkspacePage({ params }: Props) {
               >
                 Agent
               </Button>
+              <Button
+                href={`/workspaces/${workspace.codename}/forks`}
+                variant="secondary"
+                size="md"
+              >
+                Forks
+              </Button>
               {projects.length > 0 && canCreate && (
                 <Button
                   href={`/workspaces/${workspace.codename}/projects/new`}

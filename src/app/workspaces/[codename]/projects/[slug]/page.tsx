@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { CommitList } from "@/components/commits/CommitList";
 import { CoworkLauncher } from "@/components/cowork/CoworkLauncher";
 import { GithubLinkCard } from "@/components/github/GithubLinkCard";
+import { RequestForkButton } from "@/components/forks/RequestForkButton";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -176,6 +177,13 @@ export default async function ProjectPage({ params }: Props) {
                 initialRepo={project.githubRepo}
                 canEdit={role === "manager" || role === "dev"}
               />
+
+              {project.githubRepo && role !== "manager" && (
+                <RequestForkButton
+                  codename={workspace.codename}
+                  slug={project.slug}
+                />
+              )}
 
               <DetailCard title="Preview">
                 {project.previewUrl ? (
