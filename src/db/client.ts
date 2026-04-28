@@ -14,7 +14,9 @@ function makeClient() {
     // Routes that touch the DB will throw when they actually call db.
     return null;
   }
-  return postgres(url, { prepare: false, max: 10 });
+  // Supabase requires SSL on the pooler. We force it here so a bare
+  // connection string (without ?sslmode=require) still negotiates TLS.
+  return postgres(url, { prepare: false, max: 10, ssl: "require" });
 }
 
 const client = global.__elfPg ?? makeClient();
