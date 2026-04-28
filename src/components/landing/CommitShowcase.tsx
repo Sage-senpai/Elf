@@ -58,6 +58,14 @@ export function CommitShowcase() {
           </p>
         </div>
 
+        {/* Elf with tablet, reading the stack of commit cards */}
+        <img
+          src="/illustrations/commit-showcase.svg"
+          alt=""
+          className="block w-full max-w-3xl mx-auto mb-12"
+          loading="lazy"
+        />
+
         <div className="space-y-3 max-w-3xl">
           {commits.map((c, i) => (
             <CommitCard key={i} commit={c} />

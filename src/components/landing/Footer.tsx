@@ -33,9 +33,21 @@ export function Footer() {
           <FooterCol title="company" items={company} />
         </div>
 
-        <div className="mt-12 pt-6 border-t border-hair flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        {/* Sleeping elf — the SVG includes the "leave it to elf." tagline,
+            so the bottom row stays minimal to avoid duplicating it. */}
+        <div className="flex justify-center mt-16 mb-6">
+          <img
+            src="/illustrations/footer-sleeping-elf.svg"
+            alt=""
+            width={300}
+            height={150}
+            loading="lazy"
+          />
+        </div>
+
+        <div className="mt-2 pt-6 border-t border-hair flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <p className="text-xs text-elf-muted">
-            Leave it to elf. © {new Date().getFullYear()} elf.
+            © {new Date().getFullYear()} elf.
           </p>
           <p className="mono text-xs text-elf-muted">
             Built in the open.

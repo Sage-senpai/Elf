@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600">
+  <!-- HOW IT WORKS — three contributors converge on one workspace -->
+  <!-- Three figures (dev, writer, manager) on left, lines flow right into a shelf with the elf perched -->
+
+  <defs>
+    <linearGradient id="bgWash" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F1EFE8"/>
+      <stop offset="1" stop-color="#E8E4D8"/>
+    </linearGradient>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8B6F47"/>
+      <stop offset="0.5" stop-color="#6B5234"/>
+      <stop offset="1" stop-color="#5A4429"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(15,61,43,0.05)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <!-- BG -->
+  <rect width="1200" height="600" fill="url(#bgWash)"/>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+
+  <!-- ────────────────── DEV (top left) ────────────────── -->
+  <g transform="translate(120, 100)">
+    <!-- Role label -->
+    <text x="60" y="-12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0F6E56" letter-spacing="2">DEV</text>
+
+    <!-- Avatar -->
+    <circle cx="60" cy="40" r="36" fill="#0F6E56"/>
+    <circle cx="60" cy="32" r="14" fill="#F1EFE8"/>
+    <path d="M 36 60 Q 60 50 84 60 L 84 76 L 36 76 Z" fill="#F1EFE8"/>
+
+    <!-- Code commit bubble -->
+    <g transform="translate(120, 12)">
+      <rect x="0" y="0" width="180" height="68" rx="8" fill="#FFFFFF" stroke="#D3D1C7" stroke-width="0.5"/>
+      <rect x="10" y="10" width="40" height="14" rx="3" fill="#E1F5EE"/>
+      <text x="30" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#085041" font-weight="500">FEAT</text>
+      <text x="60" y="20" font-family="JetBrains Mono, monospace" font-size="9" fill="#5F5E5A">auth/github</text>
+      <text x="10" y="42" font-family="Inter, sans-serif" font-size="11" fill="#2C2C2A">GitHub OAuth lands</text>
+      <text x="10" y="58" font-family="Inter, sans-serif" font-size="9" fill="#5F5E5A">first-time users get one-click sign-in</text>
+    </g>
+  </g>
+
+  <!-- ────────────────── CONTENT (middle left) ────────────────── -->
+  <g transform="translate(120, 270)">
+    <text x="60" y="-12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#C94070" letter-spacing="2">WRITER</text>
+
+    <circle cx="60" cy="40" r="36" fill="#C94070"/>
+    <circle cx="60" cy="32" r="14" fill="#F1EFE8"/>
+    <path d="M 36 60 Q 60 50 84 60 L 84 76 L 36 76 Z" fill="#F1EFE8"/>
+
+    <g transform="translate(120, 12)">
+      <rect x="0" y="0" width="180" height="68" rx="8" fill="#FFFFFF" stroke="#D3D1C7" stroke-width="0.5"/>
+      <rect x="10" y="10" width="56" height="14" rx="3" fill="#FBEAF0"/>
+      <text x="38" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#72243E" font-weight="500">CONTENT</text>
+      <text x="74" y="20" font-family="JetBrains Mono, monospace" font-size="9" fill="#5F5E5A">docs/onboarding</text>
+      <text x="10" y="42" font-family="Inter, sans-serif" font-size="11" fill="#2C2C2A">Onboarding guide, draft 2</text>
+      <text x="10" y="58" font-family="Inter, sans-serif" font-size="9" fill="#5F5E5A">no jargon, reviewed with non-devs</text>
+    </g>
+  </g>
+
+  <!-- ────────────────── MANAGER (bottom left) ────────────────── -->
+  <g transform="translate(120, 440)">
+    <text x="60" y="-12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#BA7517" letter-spacing="2">MANAGER</text>
+
+    <circle cx="60" cy="40" r="36" fill="#BA7517"/>
+    <circle cx="60" cy="32" r="14" fill="#F1EFE8"/>
+    <path d="M 36 60 Q 60 50 84 60 L 84 76 L 36 76 Z" fill="#F1EFE8"/>
+
+    <g transform="translate(120, 12)">
+      <rect x="0" y="0" width="180" height="68" rx="8" fill="#FFFFFF" stroke="#D3D1C7" stroke-width="0.5"/>
+      <rect x="10" y="10" width="40" height="14" rx="3" fill="#FAEEDA"/>
+      <text x="30" y="20" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#633806" font-weight="500">AUDIT</text>
+      <text x="60" y="20" font-family="JetBrains Mono, monospace" font-size="9" fill="#5F5E5A">forks/approval</text>
+      <text x="10" y="42" font-family="Inter, sans-serif" font-size="11" fill="#2C2C2A">Fork approved for Michael</text>
+      <text x="10" y="58" font-family="Inter, sans-serif" font-size="9" fill="#5F5E5A">on-chain settlement, audit logged</text>
+    </g>
+  </g>
+
+  <!-- ────────────────── FLOW LINES — converging to the right ────────────────── -->
+  <path d="M 420 140 Q 600 140 700 280" fill="none" stroke="#0F6E56" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 420 310 Q 600 310 700 300" fill="none" stroke="#C94070" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+  <path d="M 420 480 Q 600 480 700 320" fill="none" stroke="#BA7517" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5"/>
+
+  <!-- Flow dots -->
+  <circle cx="540" cy="180" r="3" fill="#0F6E56"/>
+  <circle cx="540" cy="310" r="3" fill="#C94070"/>
+  <circle cx="540" cy="450" r="3" fill="#BA7517"/>
+
+  <!-- ────────────────── THE SHELF + ELF (right side) ────────────────── -->
+  <g transform="translate(740, 180)">
+    <!-- Three cards on shelf -->
+    <g transform="translate(20, 80)">
+      <!-- Card 1 -->
+      <g transform="rotate(-2 50 90)">
+        <rect x="20" y="20" width="80" height="120" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+        <text x="30" y="40" font-family="DM Serif Display, Georgia, serif" font-size="11" fill="#0F3D2B">Quiz</text>
+        <text x="30" y="52" font-family="JetBrains Mono, monospace" font-size="7" fill="#5F5E5A">DEV · ACTIVE</text>
+        <circle cx="92" cy="38" r="3" fill="#1D9E75"/>
+        <rect x="30" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <rect x="46" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <circle cx="36" cy="120" r="5" fill="#0F6E56"/>
+        <circle cx="44" cy="120" r="5" fill="#534AB7"/>
+      </g>
+
+      <!-- Card 2 -->
+      <g transform="rotate(1 165 90)">
+        <rect x="135" y="20" width="80" height="120" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+        <text x="145" y="40" font-family="DM Serif Display, Georgia, serif" font-size="11" fill="#0F3D2B">Q3 Brief</text>
+        <text x="145" y="52" font-family="JetBrains Mono, monospace" font-size="7" fill="#5F5E5A">CONTENT · WIP</text>
+        <circle cx="207" cy="38" r="3" fill="#BA7517"/>
+        <rect x="145" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <rect x="161" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <circle cx="151" cy="120" r="5" fill="#C94070"/>
+        <circle cx="159" cy="120" r="5" fill="#0F6E56"/>
+      </g>
+
+      <!-- Card 3 -->
+      <g transform="rotate(-1 280 90)">
+        <rect x="250" y="20" width="80" height="120" rx="6" fill="#F1EFE8" stroke="#D3D1C7" stroke-width="0.5"/>
+        <text x="260" y="40" font-family="DM Serif Display, Georgia, serif" font-size="11" fill="#0F3D2B">Brand</text>
+        <text x="260" y="52" font-family="JetBrains Mono, monospace" font-size="7" fill="#5F5E5A">DESIGN · CONCEPT</text>
+        <circle cx="322" cy="38" r="3" fill="#534AB7"/>
+        <rect x="260" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <rect x="276" y="64" width="14" height="6" rx="1" fill="rgba(211,209,199,0.5)"/>
+        <circle cx="266" cy="120" r="5" fill="#534AB7"/>
+        <circle cx="274" cy="120" r="5" fill="#C94070"/>
+      </g>
+    </g>
+
+    <!-- Wooden plank -->
+    <rect x="0" y="220" width="380" height="20" rx="3" fill="url(#wood)"/>
+    <rect x="0" y="220" width="380" height="2" fill="rgba(255,255,255,0.3)"/>
+    <rect x="-2" y="234" width="14" height="22" fill="#3F2F1C"/>
+    <rect x="368" y="234" width="14" height="22" fill="#3F2F1C"/>
+
+    <!-- Elf perched on the right end -->
+    <g transform="translate(280, 0) scale(0.6)">
+      <!-- Hat -->
+      <ellipse cx="100" cy="62" rx="48" ry="10" fill="#0A2D1F"/>
+      <ellipse cx="100" cy="60" rx="48" ry="9" fill="#0F3D2B"/>
+      <path d="M 60 60 Q 76 8 100 6 Q 124 8 140 60 Z" fill="#0F3D2B"/>
+      <path d="M 64 50 Q 100 56 136 50 L 138 60 Q 100 66 62 60 Z" fill="#0F6E56"/>
+      <rect x="92" y="50" width="16" height="10" rx="1.5" fill="#9FE1CB" stroke="#0A2D1F" stroke-width="0.8"/>
+      <circle cx="100" cy="6" r="6" fill="#9FE1CB"/>
+
+      <!-- Ears -->
+      <path d="M 60 100 L 38 80 Q 32 92 42 110 Z" fill="#F1EFE8"/>
+      <path d="M 140 100 L 162 80 Q 168 92 158 110 Z" fill="#F1EFE8"/>
+
+      <!-- Head -->
+      <ellipse cx="100" cy="105" rx="42" ry="44" fill="#F1EFE8"/>
+
+      <!-- Cheeks -->
+      <ellipse cx="72" cy="118" rx="9" ry="6" fill="#E8AA94" opacity="0.55"/>
+      <ellipse cx="128" cy="118" rx="9" ry="6" fill="#E8AA94" opacity="0.55"/>
+
+      <!-- Eyebrows -->
+      <path d="M 72 92 Q 80 89 88 92" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M 112 92 Q 120 89 128 92" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+      <!-- Eyes -->
+      <ellipse cx="80" cy="105" rx="7" ry="9" fill="#FFFFFF"/>
+      <ellipse cx="80" cy="106" rx="5.5" ry="7" fill="#0F6E56"/>
+      <circle cx="81" cy="105" r="3" fill="#0F3D2B"/>
+      <circle cx="82.5" cy="103" r="1.4" fill="#FFFFFF"/>
+
+      <ellipse cx="120" cy="105" rx="7" ry="9" fill="#FFFFFF"/>
+      <ellipse cx="120" cy="106" rx="5.5" ry="7" fill="#0F6E56"/>
+      <circle cx="121" cy="105" r="3" fill="#0F3D2B"/>
+      <circle cx="122.5" cy="103" r="1.4" fill="#FFFFFF"/>
+
+      <!-- Nose + mouth -->
+      <ellipse cx="100" cy="120" rx="3.5" ry="2.5" fill="#E8AA94"/>
+      <path d="M 88 132 Q 100 142 112 132" fill="none" stroke="#2C2C2A" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Scarf -->
+      <path d="M 60 148 Q 100 156 140 148 L 142 162 Q 100 168 58 162 Z" fill="#9FE1CB"/>
+      <path d="M 78 156 L 70 178 L 86 168 Z" fill="#9FE1CB"/>
+
+      <!-- Body -->
+      <path d="M 70 158 Q 100 168 130 158 L 138 220 Q 100 230 62 220 Z" fill="#0F6E56"/>
+      <circle cx="100" cy="180" r="2" fill="#9FE1CB"/>
+      <circle cx="100" cy="195" r="2" fill="#9FE1CB"/>
+      <circle cx="100" cy="210" r="2" fill="#9FE1CB"/>
+
+      <!-- Right arm with thumbs up -->
+      <path d="M 130 170 Q 142 174 156 168" stroke="#0F6E56" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <circle cx="158" cy="166" r="7" fill="#F1EFE8"/>
+      <rect x="156" y="152" width="4" height="10" rx="2" fill="#F1EFE8"/>
+
+      <!-- Left arm down -->
+      <path d="M 70 170 Q 60 190 60 210" stroke="#0F6E56" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <circle cx="60" cy="212" r="6" fill="#F1EFE8"/>
+
+      <!-- Legs -->
+      <path d="M 80 222 Q 78 236 76 244" stroke="#0F3D2B" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M 120 222 Q 122 236 124 244" stroke="#0F3D2B" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+      <!-- Shoes -->
+      <path d="M 70 244 Q 68 250 76 252 Q 84 252 86 246 Q 88 240 80 240 Z" fill="#0A2D1F"/>
+      <path d="M 130 244 Q 132 250 124 252 Q 116 252 114 246 Q 112 240 120 240 Z" fill="#0A2D1F"/>
+    </g>
+  </g>
+
+  <!-- Workspace label below shelf -->
+  <text x="930" y="510" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#0F6E56" letter-spacing="2">ONE WORKSPACE</text>
+  <line x1="800" y1="490" x2="880" y2="490" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="980" y1="490" x2="1060" y2="490" stroke="#D3D1C7" stroke-width="0.5"/>
+</svg>

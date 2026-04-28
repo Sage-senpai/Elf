@@ -47,6 +47,14 @@ export function Stack() {
           </p>
         </div>
 
+        {/* Elf orchestrating four infrastructure nodes around the shelf */}
+        <img
+          src="/illustrations/stack-orchestration.svg"
+          alt=""
+          className="block w-full max-w-4xl mx-auto mb-16 rounded-card"
+          loading="lazy"
+        />
+
         <div className="grid gap-8 md:grid-cols-2">
           {layers.map((layer) => (
             <div

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <!-- FOOTER ELF — sleeping on a shelf, day's work done -->
+
+  <defs>
+    <linearGradient id="fWood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8B6F47"/>
+      <stop offset="1" stop-color="#5A4429"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sleeping Z's floating up -->
+  <g transform="translate(280, 30)">
+    <text x="0" y="0" font-family="DM Serif Display, Georgia, serif" font-size="20" fill="#0F6E56" opacity="0.4">z</text>
+    <text x="14" y="-10" font-family="DM Serif Display, Georgia, serif" font-size="16" fill="#0F6E56" opacity="0.6">z</text>
+    <text x="26" y="-22" font-family="DM Serif Display, Georgia, serif" font-size="22" fill="#0F6E56" opacity="0.8">z</text>
+  </g>
+
+  <!-- Elf lying on the shelf -->
+  <g transform="translate(120, 50)">
+    <!-- Body lying on side -->
+    <ellipse cx="100" cy="92" rx="80" ry="20" fill="#0F6E56"/>
+    <ellipse cx="100" cy="88" rx="78" ry="18" fill="#0F6E56"/>
+
+    <!-- Hat lying down beside head -->
+    <g transform="translate(20, 60)">
+      <ellipse cx="0" cy="20" rx="30" ry="6" fill="#0A2D1F"/>
+      <path d="M -22 20 Q -16 -8 0 -14 Q 16 -8 22 20 Z" transform="rotate(-65 0 0) translate(-10 14)" fill="#0F3D2B"/>
+      <circle cx="-30" cy="0" r="4" fill="#9FE1CB"/>
+    </g>
+
+    <!-- Head resting -->
+    <ellipse cx="60" cy="80" rx="32" ry="34" fill="#F1EFE8"/>
+
+    <!-- Ear (only one visible from this angle) -->
+    <path d="M 30 75 L 14 60 Q 10 70 18 84 Z" fill="#F1EFE8"/>
+    <path d="M 28 76 L 18 68 Q 16 76 22 82 Z" fill="#E0D5C2"/>
+
+    <!-- Cheek -->
+    <ellipse cx="44" cy="92" rx="7" ry="5" fill="#E8AA94" opacity="0.55"/>
+
+    <!-- Closed eye (sleeping) -->
+    <path d="M 48 78 Q 56 80 62 78" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M 70 78 Q 78 80 84 78" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+    <!-- Eyelashes -->
+    <line x1="50" y1="76" x2="48" y2="73" stroke="#2C2C2A" stroke-width="0.8"/>
+    <line x1="55" y1="76" x2="55" y2="72" stroke="#2C2C2A" stroke-width="0.8"/>
+    <line x1="60" y1="76" x2="62" y2="73" stroke="#2C2C2A" stroke-width="0.8"/>
+    <line x1="72" y1="76" x2="70" y2="73" stroke="#2C2C2A" stroke-width="0.8"/>
+    <line x1="77" y1="76" x2="77" y2="72" stroke="#2C2C2A" stroke-width="0.8"/>
+    <line x1="82" y1="76" x2="84" y2="73" stroke="#2C2C2A" stroke-width="0.8"/>
+
+    <!-- Nose -->
+    <ellipse cx="66" cy="92" rx="3" ry="2" fill="#E8AA94"/>
+
+    <!-- Peaceful sleeping mouth -->
+    <path d="M 58 100 Q 62 102 68 100" fill="none" stroke="#2C2C2A" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Scarf wrapped (visible portion) -->
+    <path d="M 38 110 Q 60 116 88 110 L 90 118 Q 60 124 36 118 Z" fill="#9FE1CB"/>
+
+    <!-- One leg curled under body -->
+    <path d="M 145 95 Q 165 92 175 102" stroke="#0F3D2B" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <!-- Shoe -->
+    <path d="M 175 102 Q 184 100 184 108 Q 184 114 174 112 Z" fill="#0A2D1F"/>
+    <circle cx="178" cy="106" r="1.5" fill="#9FE1CB"/>
+
+    <!-- Arm draped -->
+    <path d="M 100 105 Q 110 115 130 110" stroke="#0F6E56" stroke-width="9" fill="none" stroke-linecap="round"/>
+    <circle cx="132" cy="110" r="5" fill="#F1EFE8"/>
+  </g>
+
+  <!-- Wooden shelf plank under the elf -->
+  <rect x="50" y="155" width="300" height="14" rx="2" fill="url(#fWood)"/>
+  <rect x="50" y="155" width="300" height="1.5" fill="rgba(255,255,255,0.25)"/>
+  <rect x="48" y="167" width="10" height="16" fill="#3F2F1C"/>
+  <rect x="342" y="167" width="10" height="16" fill="#3F2F1C"/>
+
+  <!-- Tagline-style text below -->
+  <text x="200" y="195" text-anchor="middle" font-family="DM Serif Display, Georgia, serif" font-size="13" fill="#5F5E5A" font-style="italic" opacity="0.7">leave it to elf.</text>
+</svg>

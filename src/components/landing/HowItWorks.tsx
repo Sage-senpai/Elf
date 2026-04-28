@@ -35,6 +35,14 @@ export function HowItWorks() {
           </h2>
         </div>
 
+        {/* Three role panels (dev / writer / manager) flowing into the elf */}
+        <img
+          src="/illustrations/howitworks-flow.svg"
+          alt=""
+          className="block w-full max-w-4xl mx-auto mb-16"
+          loading="lazy"
+        />
+
         <div className="grid gap-px bg-elf-border md:grid-cols-3">
           {steps.map((step) => (
             <div

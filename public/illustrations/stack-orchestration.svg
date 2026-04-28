@@ -1,0 +1,236 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" width="1200" height="700">
+  <!-- STACK DIAGRAM — for the dark forest section -->
+  <!-- Elf at center on a shelf, four decentralized infrastructure layers orbiting around -->
+
+  <defs>
+    <radialGradient id="centerGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#1D9E75" stop-opacity="0.3"/>
+      <stop offset="1" stop-color="#0F3D2B" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="darkBg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0F3D2B"/>
+      <stop offset="1" stop-color="#0A2D1F"/>
+    </linearGradient>
+    <linearGradient id="woodDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5A4429"/>
+      <stop offset="1" stop-color="#3F2F1C"/>
+    </linearGradient>
+  </defs>
+
+  <!-- BG -->
+  <rect width="1200" height="700" fill="url(#darkBg)"/>
+
+  <!-- Subtle grid -->
+  <g opacity="0.15">
+    <pattern id="darkGrid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#9FE1CB" stroke-width="0.5"/>
+    </pattern>
+    <rect width="1200" height="700" fill="url(#darkGrid)"/>
+  </g>
+
+  <!-- Center glow -->
+  <ellipse cx="600" cy="350" rx="350" ry="200" fill="url(#centerGlow)"/>
+
+  <!-- ────────────────── ORBIT RINGS ────────────────── -->
+  <ellipse cx="600" cy="350" rx="380" ry="220" fill="none" stroke="#9FE1CB" stroke-width="0.5" stroke-dasharray="4 6" opacity="0.3"/>
+  <ellipse cx="600" cy="350" rx="280" ry="160" fill="none" stroke="#9FE1CB" stroke-width="0.5" stroke-dasharray="2 4" opacity="0.2"/>
+
+  <!-- ────────────────── 4 INFRASTRUCTURE NODES ────────────────── -->
+
+  <!-- TOP LEFT — 0G (storage + audit) -->
+  <g transform="translate(220, 130)">
+    <!-- Connection line to center -->
+    <path d="M 90 60 Q 280 130 380 220" stroke="#9FE1CB" stroke-width="1" stroke-dasharray="3 4" opacity="0.4" fill="none"/>
+    <!-- Pulse dot on line -->
+    <circle cx="200" cy="115" r="3" fill="#9FE1CB"/>
+
+    <!-- Node card -->
+    <rect x="0" y="0" width="200" height="100" rx="10" fill="#0F3D2B" stroke="#1D9E75" stroke-width="1"/>
+    <rect x="0" y="0" width="4" height="100" rx="0" fill="#9FE1CB"/>
+
+    <text x="20" y="28" font-family="JetBrains Mono, monospace" font-size="10" fill="#9FE1CB" letter-spacing="2">PERMANENT RECORD</text>
+    <text x="20" y="56" font-family="DM Serif Display, Georgia, serif" font-size="22" fill="#F1EFE8">0G</text>
+    <text x="20" y="78" font-family="Inter, sans-serif" font-size="11" fill="#9FE1CB" opacity="0.7">Audit log + agent storage</text>
+
+    <!-- Icon: storage chip -->
+    <g transform="translate(150, 30)">
+      <rect x="0" y="0" width="32" height="32" rx="4" fill="none" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="6" y1="0" x2="6" y2="-4" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="14" y1="0" x2="14" y2="-4" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="22" y1="0" x2="22" y2="-4" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="6" y1="32" x2="6" y2="36" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="14" y1="32" x2="14" y2="36" stroke="#9FE1CB" stroke-width="1.5"/>
+      <line x1="22" y1="32" x2="22" y2="36" stroke="#9FE1CB" stroke-width="1.5"/>
+      <rect x="8" y="8" width="16" height="16" rx="2" fill="#9FE1CB" opacity="0.3"/>
+    </g>
+  </g>
+
+  <!-- TOP RIGHT — AXL (encrypted P2P messaging) -->
+  <g transform="translate(780, 130)">
+    <path d="M 110 60 Q -80 130 -180 220" stroke="#9FE1CB" stroke-width="1" stroke-dasharray="3 4" opacity="0.4" fill="none"/>
+    <circle cx="0" cy="115" r="3" fill="#9FE1CB"/>
+
+    <rect x="0" y="0" width="200" height="100" rx="10" fill="#0F3D2B" stroke="#1D9E75" stroke-width="1"/>
+    <rect x="0" y="0" width="4" height="100" rx="0" fill="#9FE1CB"/>
+
+    <text x="20" y="28" font-family="JetBrains Mono, monospace" font-size="10" fill="#9FE1CB" letter-spacing="2">ENCRYPTED MESH</text>
+    <text x="20" y="56" font-family="DM Serif Display, Georgia, serif" font-size="22" fill="#F1EFE8">AXL</text>
+    <text x="20" y="78" font-family="Inter, sans-serif" font-size="11" fill="#9FE1CB" opacity="0.7">P2P cowork routing</text>
+
+    <!-- Icon: mesh network -->
+    <g transform="translate(150, 30)">
+      <circle cx="6" cy="6" r="3" fill="#9FE1CB"/>
+      <circle cx="26" cy="6" r="3" fill="#9FE1CB"/>
+      <circle cx="6" cy="26" r="3" fill="#9FE1CB"/>
+      <circle cx="26" cy="26" r="3" fill="#9FE1CB"/>
+      <circle cx="16" cy="16" r="3" fill="#9FE1CB"/>
+      <line x1="6" y1="6" x2="16" y2="16" stroke="#9FE1CB" stroke-width="1"/>
+      <line x1="26" y1="6" x2="16" y2="16" stroke="#9FE1CB" stroke-width="1"/>
+      <line x1="6" y1="26" x2="16" y2="16" stroke="#9FE1CB" stroke-width="1"/>
+      <line x1="26" y1="26" x2="16" y2="16" stroke="#9FE1CB" stroke-width="1"/>
+      <line x1="6" y1="6" x2="26" y2="6" stroke="#9FE1CB" stroke-width="0.5" opacity="0.5"/>
+      <line x1="6" y1="26" x2="26" y2="26" stroke="#9FE1CB" stroke-width="0.5" opacity="0.5"/>
+    </g>
+  </g>
+
+  <!-- BOTTOM LEFT — KeeperHub (guaranteed execution) -->
+  <g transform="translate(220, 470)">
+    <path d="M 90 40 Q 280 -30 380 -120" stroke="#9FE1CB" stroke-width="1" stroke-dasharray="3 4" opacity="0.4" fill="none"/>
+    <circle cx="200" cy="-15" r="3" fill="#9FE1CB"/>
+
+    <rect x="0" y="0" width="200" height="100" rx="10" fill="#0F3D2B" stroke="#1D9E75" stroke-width="1"/>
+    <rect x="0" y="0" width="4" height="100" rx="0" fill="#9FE1CB"/>
+
+    <text x="20" y="28" font-family="JetBrains Mono, monospace" font-size="10" fill="#9FE1CB" letter-spacing="2">GUARANTEED EXEC</text>
+    <text x="20" y="56" font-family="DM Serif Display, Georgia, serif" font-size="22" fill="#F1EFE8">KeeperHub</text>
+    <text x="20" y="78" font-family="Inter, sans-serif" font-size="11" fill="#9FE1CB" opacity="0.7">Fork approval + retries</text>
+
+    <!-- Icon: shield with check -->
+    <g transform="translate(150, 30)">
+      <path d="M 16 0 L 32 6 L 32 18 Q 32 28 16 36 Q 0 28 0 18 L 0 6 Z" fill="none" stroke="#9FE1CB" stroke-width="1.5"/>
+      <path d="M 8 18 L 14 24 L 24 12" fill="none" stroke="#9FE1CB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- BOTTOM RIGHT — Uniswap (treasury + payments) -->
+  <g transform="translate(780, 470)">
+    <path d="M 110 40 Q -80 -30 -180 -120" stroke="#9FE1CB" stroke-width="1" stroke-dasharray="3 4" opacity="0.4" fill="none"/>
+    <circle cx="0" cy="-15" r="3" fill="#9FE1CB"/>
+
+    <rect x="0" y="0" width="200" height="100" rx="10" fill="#0F3D2B" stroke="#1D9E75" stroke-width="1"/>
+    <rect x="0" y="0" width="4" height="100" rx="0" fill="#9FE1CB"/>
+
+    <text x="20" y="28" font-family="JetBrains Mono, monospace" font-size="10" fill="#9FE1CB" letter-spacing="2">TRUSTLESS PAYMENTS</text>
+    <text x="20" y="56" font-family="DM Serif Display, Georgia, serif" font-size="22" fill="#F1EFE8">Uniswap</text>
+    <text x="20" y="78" font-family="Inter, sans-serif" font-size="11" fill="#9FE1CB" opacity="0.7">Contributor settlements</text>
+
+    <!-- Icon: swap arrows -->
+    <g transform="translate(150, 30)">
+      <circle cx="16" cy="16" r="16" fill="none" stroke="#9FE1CB" stroke-width="1.5"/>
+      <path d="M 8 12 L 24 12 M 20 8 L 24 12 L 20 16" fill="none" stroke="#9FE1CB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M 24 20 L 8 20 M 12 16 L 8 20 L 12 24" fill="none" stroke="#9FE1CB" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <!-- ────────────────── CENTER — ELF ON SHELF ────────────────── -->
+  <g transform="translate(500, 240)">
+    <!-- Soft glow behind -->
+    <ellipse cx="100" cy="160" rx="140" ry="100" fill="#1D9E75" opacity="0.15"/>
+
+    <!-- Elf -->
+    <g transform="translate(0, 0)">
+      <!-- Hat -->
+      <ellipse cx="100" cy="62" rx="48" ry="10" fill="#0A2D1F"/>
+      <ellipse cx="100" cy="60" rx="48" ry="9" fill="#0F3D2B"/>
+      <path d="M 60 60 Q 76 8 100 6 Q 124 8 140 60 Z" fill="#0F3D2B"/>
+      <path d="M 100 6 Q 124 8 140 60 L 134 60 Q 122 18 100 12 Z" fill="#0A2D1F" opacity="0.6"/>
+      <path d="M 64 50 Q 100 56 136 50 L 138 60 Q 100 66 62 60 Z" fill="#0F6E56"/>
+      <rect x="92" y="50" width="16" height="10" rx="1.5" fill="#9FE1CB" stroke="#0A2D1F" stroke-width="0.8"/>
+      <rect x="95" y="52" width="10" height="6" rx="0.5" fill="none" stroke="#0A2D1F" stroke-width="0.8"/>
+      <circle cx="100" cy="6" r="6" fill="#9FE1CB"/>
+      <circle cx="98" cy="4" r="2" fill="#FFFFFF" opacity="0.5"/>
+
+      <!-- Ears -->
+      <path d="M 60 100 L 38 80 Q 32 92 42 110 Z" fill="#F1EFE8"/>
+      <path d="M 58 100 L 44 90 Q 42 100 48 108 Z" fill="#E0D5C2"/>
+      <path d="M 140 100 L 162 80 Q 168 92 158 110 Z" fill="#F1EFE8"/>
+      <path d="M 142 100 L 156 90 Q 158 100 152 108 Z" fill="#E0D5C2"/>
+
+      <!-- Head -->
+      <ellipse cx="100" cy="105" rx="42" ry="44" fill="#F1EFE8"/>
+      <ellipse cx="100" cy="115" rx="40" ry="34" fill="#E8E0CB" opacity="0.4"/>
+
+      <!-- Cheeks -->
+      <ellipse cx="72" cy="118" rx="9" ry="6" fill="#E8AA94" opacity="0.55"/>
+      <ellipse cx="128" cy="118" rx="9" ry="6" fill="#E8AA94" opacity="0.55"/>
+
+      <!-- Eyebrows -->
+      <path d="M 72 92 Q 80 89 88 92" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M 112 92 Q 120 89 128 92" stroke="#2C2C2A" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+      <!-- Eyes -->
+      <ellipse cx="80" cy="105" rx="7" ry="9" fill="#FFFFFF"/>
+      <ellipse cx="80" cy="106" rx="5.5" ry="7" fill="#0F6E56"/>
+      <circle cx="81" cy="105" r="3" fill="#0F3D2B"/>
+      <circle cx="82.5" cy="103" r="1.4" fill="#FFFFFF"/>
+      <circle cx="80" cy="104" r="0.7" fill="#FFFFFF" opacity="0.7"/>
+
+      <ellipse cx="120" cy="105" rx="7" ry="9" fill="#FFFFFF"/>
+      <ellipse cx="120" cy="106" rx="5.5" ry="7" fill="#0F6E56"/>
+      <circle cx="121" cy="105" r="3" fill="#0F3D2B"/>
+      <circle cx="122.5" cy="103" r="1.4" fill="#FFFFFF"/>
+      <circle cx="120" cy="104" r="0.7" fill="#FFFFFF" opacity="0.7"/>
+
+      <!-- Nose + mouth -->
+      <ellipse cx="100" cy="120" rx="3.5" ry="2.5" fill="#E8AA94"/>
+      <ellipse cx="99" cy="119" rx="1" ry="0.6" fill="#FFFFFF" opacity="0.6"/>
+      <path d="M 88 132 Q 100 142 112 132" fill="none" stroke="#2C2C2A" stroke-width="2" stroke-linecap="round"/>
+
+      <!-- Scarf -->
+      <path d="M 60 148 Q 100 156 140 148 L 142 162 Q 100 168 58 162 Z" fill="#9FE1CB"/>
+      <path d="M 78 156 L 70 178 L 86 168 Z" fill="#9FE1CB"/>
+      <path d="M 70 178 L 76 188 L 78 174 Z" fill="#9FE1CB"/>
+
+      <!-- Body/coat -->
+      <path d="M 70 158 Q 100 168 130 158 L 138 220 Q 100 230 62 220 Z" fill="#0F6E56"/>
+      <path d="M 100 168 L 100 226" stroke="#0F3D2B" stroke-width="1.5" opacity="0.5"/>
+      <circle cx="100" cy="180" r="2" fill="#9FE1CB"/>
+      <circle cx="100" cy="195" r="2" fill="#9FE1CB"/>
+      <circle cx="100" cy="210" r="2" fill="#9FE1CB"/>
+
+      <!-- Arms — both holding orchestrating -->
+      <path d="M 70 170 Q 56 178 48 168" stroke="#0F6E56" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <circle cx="46" cy="166" r="6" fill="#F1EFE8"/>
+
+      <path d="M 130 170 Q 144 178 152 168" stroke="#0F6E56" stroke-width="11" fill="none" stroke-linecap="round"/>
+      <circle cx="154" cy="166" r="6" fill="#F1EFE8"/>
+
+      <!-- Legs -->
+      <path d="M 80 222 Q 78 236 76 244" stroke="#0F3D2B" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M 120 222 Q 122 236 124 244" stroke="#0F3D2B" stroke-width="9" fill="none" stroke-linecap="round"/>
+
+      <!-- Shoes -->
+      <path d="M 70 244 Q 68 250 76 252 Q 84 252 86 246 Q 88 240 80 240 Z" fill="#0A2D1F"/>
+      <circle cx="86" cy="244" r="1.5" fill="#9FE1CB"/>
+      <path d="M 130 244 Q 132 250 124 252 Q 116 252 114 246 Q 112 240 120 240 Z" fill="#0A2D1F"/>
+      <circle cx="114" cy="244" r="1.5" fill="#9FE1CB"/>
+    </g>
+
+    <!-- Wooden plank under the elf -->
+    <rect x="-40" y="248" width="280" height="20" rx="3" fill="url(#woodDark)"/>
+    <rect x="-40" y="248" width="280" height="2" fill="rgba(255,255,255,0.15)"/>
+  </g>
+
+  <!-- Center label -->
+  <text x="600" y="640" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#9FE1CB" letter-spacing="3">ELF · THE WORKSPACE LAYER</text>
+  <line x1="430" y1="630" x2="510" y2="630" stroke="#9FE1CB" stroke-width="0.5" opacity="0.5"/>
+  <line x1="690" y1="630" x2="770" y2="630" stroke="#9FE1CB" stroke-width="0.5" opacity="0.5"/>
+
+  <!-- Sparkles -->
+  <g opacity="0.6">
+    <path d="M 300 300 L 302 296 L 304 300 L 308 302 L 304 304 L 302 308 L 300 304 L 296 302 Z" fill="#9FE1CB"/>
+    <path d="M 900 280 L 902 276 L 904 280 L 908 282 L 904 284 L 902 288 L 900 284 L 896 282 Z" fill="#9FE1CB"/>
+    <path d="M 350 450 L 352 446 L 354 450 L 358 452 L 354 454 L 352 458 L 350 454 L 346 452 Z" fill="#9FE1CB"/>
+    <path d="M 850 440 L 852 436 L 854 440 L 858 442 L 854 444 L 852 448 L 850 444 L 846 442 Z" fill="#9FE1CB"/>
+  </g>
+</svg>
