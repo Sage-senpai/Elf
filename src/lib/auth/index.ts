@@ -61,6 +61,9 @@ if (!process.env.BETTER_AUTH_SECRET && process.env.NODE_ENV === "production") {
 export const auth = betterAuth({
   baseURL,
   trustedOrigins,
+  logger: {
+    level: "debug"
+  },
   secret: process.env.BETTER_AUTH_SECRET ?? "dev-only-secret-change-me",
   database: drizzleAdapter(db, {
     provider: "pg",
