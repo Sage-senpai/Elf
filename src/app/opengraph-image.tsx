@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 export const alt = "elf — leave it to elf.";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
+export const runtime = "edge";
 
 export default function OpengraphImage() {
   return new ImageResponse(
@@ -39,7 +40,7 @@ export default function OpengraphImage() {
             <div style={{ width: 40, height: 9, background: "#9FE1CB", borderRadius: 2 }} />
             <div style={{ width: 56, height: 9, background: "#9FE1CB", borderRadius: 2 }} />
           </div>
-          <div style={{ fontSize: 84, color: "#0F3D2B", fontWeight: 500, letterSpacing: -2 }}>
+          <div style={{ fontSize: 84, color: "#0F3D2B", fontWeight: 500, letterSpacing: 0 }}>
             elf
           </div>
         </div>
@@ -49,7 +50,7 @@ export default function OpengraphImage() {
             fontSize: 64,
             color: "#0F3D2B",
             fontWeight: 500,
-            letterSpacing: -1.5,
+            letterSpacing: 0,
             lineHeight: 1.05,
             maxWidth: 900,
           }}

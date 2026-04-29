@@ -1,6 +1,13 @@
 import "server-only";
-import { createPublicClient, createWalletClient, http, parseUnits, formatUnits, getContract } from "viem";
-import { base, baseSepolia } from "viem/chains";
+import {
+  createPublicClient,
+  createWalletClient,
+  defineChain,
+  formatUnits,
+  getContract,
+  http,
+  parseUnits
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { decryptSecret } from "@/lib/crypto";
 import {
@@ -46,6 +53,31 @@ const ERC20_ABI = [
     type: "function"
   }
 ] as const;
+
+const base = defineChain({
+  id: 8453,
+  name: "Base",
+  nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["https://mainnet.base.org"] }
+  },
+  blockExplorers: {
+    default: { name: "Basescan", url: "https://basescan.org" }
+  }
+});
+
+const baseSepolia = defineChain({
+  id: 84532,
+  name: "Base Sepolia",
+  nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["https://sepolia.base.org"] }
+  },
+  blockExplorers: {
+    default: { name: "Basescan", url: "https://sepolia.basescan.org" }
+  },
+  testnet: true
+});
 
 function chainFor(chainId: number) {
   return chainId === 8453 ? base : baseSepolia;

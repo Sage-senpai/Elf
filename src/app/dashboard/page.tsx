@@ -4,6 +4,7 @@ import { HeaderActions } from "@/components/auth/HeaderActions";
 import { Button } from "@/components/ui/Button";
 import { requireSession } from "@/lib/auth/session";
 import { listWorkspacesForUser } from "@/db/repositories/workspaces";
+import { getUserSettings } from "@/db/repositories/users";
 
 export const metadata = {
   title: "Dashboard — elf"
@@ -11,7 +12,10 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const session = await requireSession();
-  const workspaces = await listWorkspacesForUser(session.user.id);
+  const [workspaces, userSettings] = await Promise.all([
+    listWorkspacesForUser(session.user.id),
+    getUserSettings(session.user.id)
+  ]);
 
   return (
     <main className="min-h-screen">
@@ -47,6 +51,23 @@ export default async function DashboardPage() {
               </Button>
             )}
           </div>
+
+          {userSettings && !userSettings.onboardingCompletedAt && (
+            <div className="border-hair rounded-card p-5 mb-8 flex items-center justify-between gap-4 flex-wrap">
+              <div>
+                <p className="mono text-xs uppercase tracking-widest text-elf-mid mb-2">
+                  onboarding
+                </p>
+                <p className="text-sm text-elf-muted">
+                  Choose your role mix so Elf can start with the right project
+                  paths and use cases.
+                </p>
+              </div>
+              <Button href="/onboarding" variant="secondary">
+                Start onboarding
+              </Button>
+            </div>
+          )}
 
           {workspaces.length === 0 ? <EmptyState /> : <WorkspaceGrid workspaces={workspaces} />}
         </div>
