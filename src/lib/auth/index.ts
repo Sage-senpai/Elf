@@ -64,6 +64,11 @@ export const auth = betterAuth({
   logger: {
     level: "debug"
   },
+  advanced: {
+    database: {
+      generateId: "uuid"
+    }
+  },
   secret: process.env.BETTER_AUTH_SECRET ?? "dev-only-secret-change-me",
   database: drizzleAdapter(db, {
     provider: "pg",
