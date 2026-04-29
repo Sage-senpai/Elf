@@ -29,6 +29,23 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+html {
+  /* Anchor jumps slide rather than snap. Reduced-motion overrides this. */
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Anchor targets land below the sticky header rather than under it. The
+   header condenses to ~56px when scrolled, so 80px gives breathing room
+   plus the section's own top padding. Scoped to <section id="..."> so
+   we don't accidentally apply this to buttons, inputs, or modal anchors. */
+section[id],
+:target {
+  scroll-margin-top: 80px;
+}
+
 /* Brand rule: no font-weight 600 or 700, anywhere. Cap at 500. */
 * {
   font-weight: inherit;
@@ -75,4 +92,31 @@ pre {
 }
 .border-hair:hover {
   border-color: var(--elf-border-mid);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Reveal-on-scroll                                                          */
+/*  Used by <RevealOnScroll>. The wrapper is rendered with `.reveal` and an   */
+/*  IntersectionObserver flips data-revealed="true" when it enters viewport.  */
+/* -------------------------------------------------------------------------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  /* Confident, gentle easing — matches the brand's deliberate tone. */
+  transition:
+    opacity 700ms cubic-bezier(0.4, 0.16, 0.6, 1),
+    transform 700ms cubic-bezier(0.4, 0.16, 0.6, 1);
+  /* Small willChange hint for the GPU without leaving it on forever. */
+  will-change: opacity, transform;
+}
+.reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
