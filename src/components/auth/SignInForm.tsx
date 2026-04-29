@@ -5,40 +5,57 @@ import { authClient } from "@/lib/auth/client";
 import { Button } from "@/components/ui/Button";
 
 type Status = "idle" | "loading" | "sent" | "error";
+type PendingAction = "github" | "magic-link" | null;
 
 export function SignInForm() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+  const [pendingAction, setPendingAction] = useState<PendingAction>(null);
   const [errorMsg, setErrorMsg] = useState("");
 
   async function onGithub() {
     setStatus("loading");
+    setPendingAction("github");
     setErrorMsg("");
     try {
-      await authClient.signIn.social({
+      const { error } = await authClient.signIn.social({
         provider: "github",
         callbackURL: "/dashboard"
       });
+      if (error) {
+        setStatus("error");
+        setErrorMsg(error.message ?? "Could not start GitHub sign-in.");
+      }
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Sign-in failed.");
+    } finally {
+      setPendingAction(null);
     }
   }
 
   async function onMagicLink(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("loading");
+    setPendingAction("magic-link");
     setErrorMsg("");
-    const { error } = await authClient.signIn.magicLink({
-      email,
-      callbackURL: "/dashboard"
-    });
-    if (error) {
+    try {
+      const { error } = await authClient.signIn.magicLink({
+        email,
+        callbackURL: "/dashboard"
+      });
+      if (error) {
+        setStatus("error");
+        setErrorMsg(error.message ?? "Could not send magic link.");
+        return;
+      }
+      setStatus("sent");
+    } catch (err) {
       setStatus("error");
-      setErrorMsg(error.message ?? "Could not send magic link.");
-      return;
+      setErrorMsg(err instanceof Error ? err.message : "Could not send magic link.");
+    } finally {
+      setPendingAction(null);
     }
-    setStatus("sent");
   }
 
   return (
@@ -52,7 +69,7 @@ export function SignInForm() {
       >
         <GithubMark />
         <span className="ml-2">
-          {status === "loading" ? "Opening GitHub…" : "Continue with GitHub"}
+          {pendingAction === "github" ? "Opening GitHub..." : "Continue with GitHub"}
         </span>
       </Button>
 
@@ -68,8 +85,7 @@ export function SignInForm() {
             Check your inbox at <strong>{email}</strong> for a sign-in link.
           </p>
           <p className="mono text-xs text-elf-muted mt-2">
-            no email? check the dev terminal — magic links print there when
-            RESEND_API_KEY isn&apos;t set
+            No email? Check the server logs if RESEND_API_KEY is not set.
           </p>
         </div>
       ) : (
@@ -95,7 +111,7 @@ export function SignInForm() {
             type="submit"
             disabled={status === "loading" || !email}
           >
-            {status === "loading" ? "Sending…" : "Email me a sign-in link"}
+            {pendingAction === "magic-link" ? "Sending..." : "Email me a sign-in link"}
           </Button>
         </form>
       )}
