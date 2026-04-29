@@ -1,6 +1,6 @@
 # elf — on-chain contracts
 
-Solidity contracts deployed to **0G Chain** (chain id 16601 testnet) as
+Solidity contracts deployed to **0G Chain** (chain id 16602, Galileo testnet) as
 part of the Elf platform.
 
 ## What's here

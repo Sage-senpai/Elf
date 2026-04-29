@@ -13,7 +13,7 @@ import {ShelfAgentStateManager} from "../src/ShelfAgentStateManager.sol";
  *     --broadcast
  *
  * Set ZG_EVM_RPC=https://evmrpc-testnet.0g.ai for the testnet (chain id
- * 16601). Replace with the mainnet RPC once Elf is live.
+ * 16602, Galileo). Replace with the mainnet RPC once Elf is live.
  */
 contract Deploy is Script {
     function run() external returns (ShelfAgentStateManager m) {

@@ -42,7 +42,7 @@ const ABI = [
 ] as const;
 
 const zgTestnet = defineChain({
-  id: 16601,
+  id: 16602,
   name: "0G Testnet",
   nativeCurrency: { name: "ZG", symbol: "ZG", decimals: 18 },
   rpcUrls: {

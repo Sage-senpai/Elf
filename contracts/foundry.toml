@@ -12,7 +12,7 @@ line_length = 100
 tab_width = 4
 bracket_spacing = false
 
-# 0G Chain testnet — chain id 16601
+# 0G Chain testnet (Galileo) — chain id 16602
 [rpc_endpoints]
 zg_testnet = "${ZG_EVM_RPC}"
 zg_mainnet = "https://evmrpc-mainnet.0g.ai"
@@ -20,4 +20,4 @@ zg_mainnet = "https://evmrpc-mainnet.0g.ai"
 [etherscan]
 # Placeholder — 0G's chainscan exposes a Sourcify-compatible verifier;
 # leave blank for hackathon, set DEPLOYER_ETHERSCAN_API_KEY to verify.
-zg_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 16601 }
+zg_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 16602 }
