@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { DM_Serif_Display, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -27,14 +27,23 @@ export const metadata: Metadata = {
   title: "elf — leave it to elf.",
   description:
     "Cross-functional builder workspace. Devs commit code, content contributors add docs, managers control access — without anyone leaving the platform.",
-  metadataBase: new URL("https://elf.so"),
+  metadataBase: new URL("https://elf-it.vercel.app"),
   openGraph: {
     title: "elf — leave it to elf.",
     description: "Every great product needs an elf.",
-    url: "https://elf.so",
+    url: "https://elf-it.vercel.app",
     siteName: "elf",
     type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "elf — leave it to elf.",
+    description: "Every great product needs an elf."
   }
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0F6E56"
 };
 
 export default function RootLayout({
