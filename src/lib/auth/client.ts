@@ -11,7 +11,7 @@ import { magicLinkClient } from "better-auth/client/plugins";
  * used by the sign-in page and the header user menu.
  */
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
+  baseURL: process.env.NEXT_PUBLIC_APP_URL ?? "https://elf-it.vercel.app",
   plugins: [magicLinkClient()]
 });
 

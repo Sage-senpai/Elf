@@ -6,7 +6,7 @@ import * as authSchema from "@/db/schema/auth";
 import { users } from "@/db/schema/users";
 import { sendMagicLinkEmail } from "./email";
 
-const baseURL = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+const baseURL = process.env.BETTER_AUTH_URL ?? "https://elf-it.vercel.app";
 
 if (!process.env.BETTER_AUTH_SECRET && process.env.NODE_ENV === "production") {
   throw new Error("BETTER_AUTH_SECRET must be set in production.");
