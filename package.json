@@ -12,7 +12,8 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "deploy:contract": "node scripts/deploy-contract.mjs"
   },
   "dependencies": {
     "@0glabs/0g-serving-broker": "^0.7.5",
@@ -47,6 +48,7 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.35",
     "postcss": "^8.4.49",
+    "solc": "^0.8.34",
     "tailwindcss": "^3.4.15",
     "typescript": "^5.6.3"
   },

@@ -99,6 +99,9 @@ importers:
       postcss:
         specifier: ^8.4.49
         version: 8.5.10
+      solc:
+        specifier: ^0.8.34
+        version: 0.8.34
       tailwindcss:
         specifier: ^3.4.15
         version: 3.4.19(tsx@4.21.0)
@@ -4964,6 +4967,11 @@ packages:
   solc@0.8.26:
     resolution: {integrity: sha512-yiPQNVf5rBFHwN6SIf3TUUvVAFKcQqmSUFeq+fb6pNRCo0ZCgpYOZDi3BVoezCPIAcKrVYd/qXlBLUP9wVrZ9g==}
     engines: {node: '>=10.0.0'}
+    hasBin: true
+
+  solc@0.8.34:
+    resolution: {integrity: sha512-qf8HajA1sHhXRV0hMSDXLjVbc4v3Q+SQbL9zok+1WmgVj7Z4oMjMHxaysCzfGtFVqjZdfDDJWyZI+tcx5bO7Dw==}
+    engines: {node: '>=12.0.0'}
     hasBin: true
 
   sonic-boom@2.8.0:
@@ -11955,6 +11963,18 @@ snapshots:
       - supports-color
 
   solc@0.8.26(debug@4.4.3):
+    dependencies:
+      command-exists: 1.2.9
+      commander: 8.3.0
+      follow-redirects: 1.16.0(debug@4.4.3)
+      js-sha3: 0.8.0
+      memorystream: 0.3.1
+      semver: 5.7.2
+      tmp: 0.0.33
+    transitivePeerDependencies:
+      - debug
+
+  solc@0.8.34:
     dependencies:
       command-exists: 1.2.9
       commander: 8.3.0
