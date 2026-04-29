@@ -64,12 +64,11 @@ export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET ?? "dev-only-secret-change-me",
   database: drizzleAdapter(db, {
     provider: "pg",
-    usePlural: true,
     schema: {
-      users,
-      sessions: authSchema.sessions,
-      accounts: authSchema.accounts,
-      verifications: authSchema.verifications
+      user: users,
+      session: authSchema.sessions,
+      account: authSchema.accounts,
+      verification: authSchema.verifications
     }
   }),
   socialProviders: {
