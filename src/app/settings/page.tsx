@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { requireSession } from "@/lib/auth/session";
 import { getUserSettings } from "@/db/repositories/users";
 import { PreferencesForm, UsernameForm } from "./SettingsForms";
+import { WalletConnector } from "@/components/wallet/WalletConnector";
 
 export const metadata = {
   title: "Settings - elf"
@@ -64,6 +65,12 @@ export default async function SettingsPage() {
                     value={user.benefitOverride === "max" ? "Max demo access" : "Standard"}
                   />
                 </dl>
+              </SettingsCard>
+              <SettingsCard title="Web3 Wallets">
+                <p className="text-sm text-elf-muted mb-4">
+                  Link crypto wallets for USDC payments and Treasury operations.
+                </p>
+                <WalletConnector />
               </SettingsCard>
             </div>
           </div>

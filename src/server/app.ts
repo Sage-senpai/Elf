@@ -13,6 +13,8 @@ import { githubRouter, projectGithubRouter } from "./routes/github";
 import { agentRouter } from "./routes/agent";
 import { projectForksRouter, workspaceForksRouter } from "./routes/forks";
 import { notificationsRouter } from "./routes/notifications";
+import { walletsRouter } from "./routes/wallets";
+import { paymentsRouter } from "./routes/payments";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -26,11 +28,13 @@ app.use("*", cors());
 app.route("/auth", authRouter);
 app.route("/health", health);
 app.route("/waitlist", waitlist);
+app.route("/wallets", walletsRouter);
 app.route("/workspaces", workspacesRouter);
 app.route("/workspaces/:codename/projects", projectsRouter);
 app.route("/workspaces/:codename/projects/:slug/commits", commitsRouter);
 app.route("/workspaces/:codename/projects/:slug/treasury", treasuryRouter);
 app.route("/workspaces/:codename/projects/:slug/cowork", coworkRouter);
+app.route("/workspaces/:codename/projects/:slug/payments", paymentsRouter);
 app.route("/github", githubRouter);
 app.route("/workspaces/:codename/projects/:slug/github", projectGithubRouter);
 app.route("/workspaces/:codename/agent", agentRouter);
