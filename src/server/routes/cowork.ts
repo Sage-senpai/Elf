@@ -79,9 +79,11 @@ export const coworkRouter = new Hono()
         content: m.content
       }));
 
-    // Use Groq if available (free!), fall back to Anthropic
-    const provider = process.env.GROQ_API_KEY ? "groq" : "anthropic";
-    const inference = getInferenceProvider(provider);
+    // Cowork uses Anthropic — the Groq path was wired up to reuse the
+    // Anthropic SDK against Groq's OpenAI-compatible base URL, which 404s
+    // on /v1/messages. Until a real OpenAI-compatible client is added,
+    // pin to Anthropic so Cowork works on prod.
+    const inference = getInferenceProvider("anthropic");
     const tools = buildCoworkTools({
       workspaceId: c.var.workspace.id,
       workspaceCodename: c.var.workspace.codename,

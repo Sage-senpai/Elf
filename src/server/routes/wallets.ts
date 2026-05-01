@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
+import { verifyMessage } from "viem";
 import { requireUser } from "../middleware/auth";
 import {
   createWallet,
@@ -111,9 +112,21 @@ export const walletsRouter = new Hono()
     }
 
     try {
-      // TODO: Verify signature using ethers.js or viem
-      // For now, we'll mark it as verified on trust
-      // In production, verify the signature matches the wallet address
+      // Cryptographically verify the signature was produced by the wallet
+      const valid = await verifyMessage({
+        address: wallet.address as `0x${string}`,
+        message: parsed.data.message,
+        signature: parsed.data.signature as `0x${string}`
+      });
+
+      if (!valid) {
+        return c.json({
+          verified: false,
+          error: "invalid_signature",
+          reason: "Signature does not match wallet address"
+        }, 400);
+      }
+
       const verified = await verifyWallet(walletId, c.var.userId);
 
       return c.json({
@@ -125,7 +138,8 @@ export const walletsRouter = new Hono()
         }
       });
     } catch (err) {
-      return c.json({ error: "verification_failed" }, 500);
+      const message = err instanceof Error ? err.message : "verification_failed";
+      return c.json({ error: "verification_failed", reason: message }, 500);
     }
   })
   .patch("/:walletId/primary", async (c) => {

@@ -1,6 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  useAccount,
+  useChainId,
+  useConnect,
+  useDisconnect,
+  useSignMessage
+} from "wagmi";
 import { Button } from "@/components/ui/Button";
 
 interface Wallet {
@@ -12,12 +19,18 @@ interface Wallet {
 }
 
 export function WalletConnector() {
+  const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { connect, connectors, isPending: isConnecting } = useConnect();
+  const { disconnect } = useDisconnect();
+  const { signMessageAsync } = useSignMessage();
+
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [loading, setLoading] = useState(false);
   const [linking, setLinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState<string | null>(null);
 
-  // Fetch user's wallets on mount
   const loadWallets = async () => {
     setLoading(true);
     setError(null);
@@ -33,25 +46,53 @@ export function WalletConnector() {
     }
   };
 
-  // Link a new wallet (placeholder for wagmi integration)
+  useEffect(() => {
+    loadWallets();
+  }, []);
+
   const linkWallet = async () => {
+    if (!address) {
+      setError("Connect your wallet first.");
+      return;
+    }
     setLinking(true);
     setError(null);
+    setStatus("Requesting verification message…");
 
     try {
-      // TODO: Connect wallet using wagmi + MetaMask
-      // For now, this is a placeholder. In production:
-      // 1. Use useAccount() from wagmi to get connected wallet
-      // 2. POST /api/wallets with chainId + address
-      // 3. Use useSignMessage() to sign the returned message
-      // 4. POST /api/wallets/:id/verify with signature
+      // 1. Ask backend for the message to sign
+      const linkRes = await fetch("/api/wallets", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ chainId, address })
+      });
+      const linkData = await linkRes.json();
+      if (!linkRes.ok) {
+        throw new Error(linkData.reason ?? linkData.error ?? "Could not start linking");
+      }
+      const { wallet, messageToSign } = linkData;
 
-      alert(
-        "Wallet linking requires wagmi setup. " +
-          "See WalletConnector component for TODO."
-      );
+      // 2. Sign with the wallet (MetaMask popup)
+      setStatus("Sign the message in your wallet…");
+      const signature = await signMessageAsync({ message: messageToSign });
+
+      // 3. Send signature back for verification
+      setStatus("Verifying signature…");
+      const verifyRes = await fetch(`/api/wallets/${wallet.id}/verify`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ message: messageToSign, signature })
+      });
+      const verifyData = await verifyRes.json();
+      if (!verifyRes.ok || !verifyData.verified) {
+        throw new Error(verifyData.reason ?? "Verification failed");
+      }
+
+      setStatus("Wallet linked!");
+      await loadWallets();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to link wallet");
+      setStatus(null);
     } finally {
       setLinking(false);
     }
@@ -69,13 +110,11 @@ export function WalletConnector() {
     }
   };
 
-  const deleteWallet = async (walletId: string) => {
-    if (!confirm("Remove this wallet?")) return;
+  const removeWallet = async (walletId: string) => {
+    if (!confirm("Remove this wallet from your account?")) return;
     try {
-      const res = await fetch(`/api/wallets/${walletId}`, {
-        method: "DELETE"
-      });
-      if (!res.ok) throw new Error("Failed to delete wallet");
+      const res = await fetch(`/api/wallets/${walletId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to remove wallet");
       await loadWallets();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -84,66 +123,91 @@ export function WalletConnector() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <Button
-          onClick={loadWallets}
-          disabled={loading}
-          variant="secondary"
-          className="mb-4"
-        >
-          {loading ? "Loading..." : "Reload wallets"}
-        </Button>
+      <div className="space-y-3">
+        {!isConnected ? (
+          <div className="space-y-2">
+            <p className="text-sm text-elf-muted">
+              Connect a wallet (MetaMask, Coinbase, etc.) to link it to your account.
+            </p>
+            {connectors.map((connector) => (
+              <Button
+                key={connector.uid}
+                onClick={() => connect({ connector })}
+                disabled={isConnecting}
+                variant="secondary"
+              >
+                {isConnecting ? "Connecting…" : `Connect ${connector.name}`}
+              </Button>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-sm text-elf-muted">Connected:</p>
+            <p className="mono text-sm break-all">{address}</p>
+            <p className="text-xs text-elf-muted">Chain ID: {chainId}</p>
+            <div className="flex gap-2 flex-wrap">
+              <Button onClick={linkWallet} disabled={linking}>
+                {linking ? "Linking…" : "Link this wallet"}
+              </Button>
+              <Button onClick={() => disconnect()} variant="secondary">
+                Disconnect
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {status && <p className="text-sm text-elf-muted">{status}</p>}
+      {error && <p className="text-sm text-red-700">{error}</p>}
 
-      {wallets.length === 0 ? (
-        <p className="text-sm text-elf-muted">
-          No wallets linked yet.{" "}
-          <button onClick={linkWallet} className="text-elf-forest underline">
-            Link your first wallet
-          </button>
+      <div className="pt-4 border-t border-elf-border">
+        <p className="mono text-xs uppercase tracking-widest text-elf-muted mb-3">
+          Linked wallets
         </p>
-      ) : (
-        <div className="space-y-3">
-          {wallets.map((wallet) => (
-            <div
-              key={wallet.id}
-              className="flex items-center justify-between gap-4 p-3 border border-elf-border rounded-card"
-            >
-              <div className="min-w-0">
-                <p className="mono text-xs text-elf-muted">Chain {wallet.chainId}</p>
-                <p className="mono text-sm break-all">{wallet.address}</p>
-                <p className="text-xs text-elf-muted mt-1">
-                  {wallet.verified ? "✓ Verified" : "⚠ Not verified"}
-                  {wallet.primaryWallet && " • Primary"}
-                </p>
-              </div>
-              <div className="flex gap-2 flex-shrink-0">
-                {!wallet.primaryWallet && wallet.verified && (
+        {loading ? (
+          <p className="text-sm text-elf-muted">Loading…</p>
+        ) : wallets.length === 0 ? (
+          <p className="text-sm text-elf-muted">
+            No wallets linked yet. Linked wallets work across GitHub and email
+            sign-in.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {wallets.map((wallet) => (
+              <div
+                key={wallet.id}
+                className="flex items-center justify-between gap-4 p-3 border border-elf-border rounded-card"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="mono text-xs text-elf-muted">
+                    Chain {wallet.chainId}
+                  </p>
+                  <p className="mono text-sm break-all">{wallet.address}</p>
+                  <p className="text-xs text-elf-muted mt-1">
+                    {wallet.verified ? "✓ Verified" : "⚠ Not verified"}
+                    {wallet.primaryWallet && " • Primary"}
+                  </p>
+                </div>
+                <div className="flex gap-2 flex-shrink-0">
+                  {!wallet.primaryWallet && wallet.verified && (
+                    <Button
+                      onClick={() => setPrimary(wallet.id)}
+                      variant="secondary"
+                    >
+                      Set primary
+                    </Button>
+                  )}
                   <Button
-                    onClick={() => setPrimary(wallet.id)}
+                    onClick={() => removeWallet(wallet.id)}
                     variant="secondary"
                   >
-                    Set primary
+                    Remove
                   </Button>
-                )}
-                <Button
-                  onClick={() => deleteWallet(wallet.id)}
-                  variant="secondary"
-                >
-                  Remove
-                </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-4 pt-4 border-t border-elf-border">
-        <Button onClick={linkWallet} disabled={linking}>
-          {linking ? "Linking..." : "Link new wallet"}
-        </Button>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

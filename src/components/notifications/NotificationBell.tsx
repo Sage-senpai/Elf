@@ -32,24 +32,64 @@ export function NotificationBell() {
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Initial unread count + poll every 30s while the page is mounted.
+  // Initial unread count + poll while the page is mounted.
+  // Adaptive cadence: every 30s when healthy, exponential backoff up to
+  // 5 minutes after consecutive failures, paused while the tab is hidden,
+  // and reset to 30s the moment a request succeeds. Prevents the console
+  // spam when DNS / network momentarily drops.
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let failures = 0;
+
+    function nextDelay(): number {
+      if (failures === 0) return 30_000;
+      const backoff = 30_000 * 2 ** Math.min(failures - 1, 4); // 30s,60s,2m,4m,5m
+      return Math.min(backoff, 300_000);
+    }
+
     async function pull() {
+      if (cancelled) return;
+      if (typeof document !== "undefined" && document.hidden) {
+        schedule();
+        return;
+      }
       try {
         const res = await fetch("/api/notifications/unread-count");
-        if (!res.ok) return;
-        const json = (await res.json()) as { count: number };
-        if (!cancelled) setUnread(json.count);
+        if (!res.ok) {
+          failures++;
+        } else {
+          const json = (await res.json()) as { count: number };
+          if (!cancelled) setUnread(json.count);
+          failures = 0;
+        }
       } catch {
-        /* ignore */
+        failures++;
+      } finally {
+        schedule();
       }
     }
-    pull();
-    const id = setInterval(pull, 30_000);
+
+    function schedule() {
+      if (cancelled) return;
+      timer = setTimeout(pull, nextDelay());
+    }
+
+    function onVisible() {
+      if (!document.hidden && failures > 0) {
+        // Snap back to a fresh attempt when the user returns.
+        if (timer) clearTimeout(timer);
+        void pull();
+      }
+    }
+
+    void pull();
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       cancelled = true;
-      clearInterval(id);
+      if (timer) clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, []);
 

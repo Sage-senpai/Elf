@@ -23,7 +23,10 @@ const Input = z.object({
   githubRepo: z
     .string()
     .max(120)
-    .regex(/^([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)?$/, 'Use "owner/repo" form')
+    .regex(
+      /^([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)?$/,
+      'Use the "owner/repo" form — e.g. "vercel/next.js" or "acme-studio/quiz-engine". Just the path, no https:// or github.com.'
+    )
     .optional(),
   stack: z
     .string()

@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" width="640" height="360" role="img" aria-label="Elf — leave it to elf">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0B5443"/>
+      <stop offset="100%" stop-color="#0F6E56"/>
+    </linearGradient>
+    <linearGradient id="markGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#13886B"/>
+      <stop offset="100%" stop-color="#0F6E56"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0%" stop-color="#9FE1CB" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#9FE1CB" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- background -->
+  <rect width="640" height="360" fill="url(#bg)"/>
+
+  <!-- soft mint glow behind mark -->
+  <circle cx="155" cy="180" r="170" fill="url(#glow)"/>
+
+  <!-- subtle grid of dots -->
+  <g fill="#9FE1CB" fill-opacity="0.08">
+    <circle cx="40" cy="40" r="1.5"/><circle cx="80" cy="40" r="1.5"/><circle cx="120" cy="40" r="1.5"/>
+    <circle cx="560" cy="40" r="1.5"/><circle cx="600" cy="40" r="1.5"/>
+    <circle cx="40" cy="320" r="1.5"/><circle cx="80" cy="320" r="1.5"/>
+    <circle cx="560" cy="320" r="1.5"/><circle cx="600" cy="320" r="1.5"/>
+  </g>
+
+  <!-- elf logomark, scaled up -->
+  <g transform="translate(75 100)">
+    <rect width="160" height="160" rx="40" fill="url(#markGrad)" stroke="#9FE1CB" stroke-opacity="0.25" stroke-width="1"/>
+    <rect x="35" y="40" width="90" height="15" rx="5" fill="#9FE1CB"/>
+    <rect x="35" y="72.5" width="65" height="15" rx="5" fill="#9FE1CB"/>
+    <rect x="35" y="105" width="90" height="15" rx="5" fill="#9FE1CB"/>
+  </g>
+
+  <!-- wordmark + tagline -->
+  <g font-family="Georgia, 'Times New Roman', serif" fill="#F4FBF7">
+    <text x="270" y="170" font-size="78" font-weight="400" letter-spacing="-2">elf</text>
+    <text x="272" y="205" font-size="17" font-style="italic" fill="#9FE1CB" letter-spacing="0.5">Leave it to elf.</text>
+  </g>
+
+  <!-- subtitle -->
+  <g font-family="Inter, -apple-system, system-ui, sans-serif" fill="#C7EBDC">
+    <text x="272" y="240" font-size="13" letter-spacing="0.3">Cross-functional builder workspace.</text>
+    <text x="272" y="260" font-size="13" letter-spacing="0.3">Decentralized. On-chain. On-brand.</text>
+  </g>
+
+  <!-- bottom badge row -->
+  <g font-family="Inter, system-ui, sans-serif" font-size="10" fill="#9FE1CB" fill-opacity="0.85" letter-spacing="2">
+    <text x="272" y="305">0G  ·  GENSYN AXL  ·  KEEPERHUB  ·  UNISWAP  ·  x402</text>
+  </g>
+
+  <!-- thin frame accent -->
+  <rect x="8" y="8" width="624" height="344" rx="12" fill="none" stroke="#9FE1CB" stroke-opacity="0.15" stroke-width="1"/>
+</svg>

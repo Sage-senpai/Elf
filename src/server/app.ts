@@ -15,6 +15,10 @@ import { projectForksRouter, workspaceForksRouter } from "./routes/forks";
 import { notificationsRouter } from "./routes/notifications";
 import { walletsRouter } from "./routes/wallets";
 import { paymentsRouter } from "./routes/payments";
+import {
+  userInvitesRouter,
+  workspaceInvitesRouter
+} from "./routes/invites";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -41,6 +45,8 @@ app.route("/workspaces/:codename/agent", agentRouter);
 app.route("/workspaces/:codename/forks", workspaceForksRouter);
 app.route("/workspaces/:codename/projects/:slug/forks", projectForksRouter);
 app.route("/notifications", notificationsRouter);
+app.route("/workspaces/:codename/invites", workspaceInvitesRouter);
+app.route("/invites", userInvitesRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
 
