@@ -8,6 +8,20 @@
       "when": 1777329292298,
       "tag": "0000_little_starhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777586242362,
+      "tag": "0001_chemical_captain_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777586813764,
+      "tag": "0002_lame_tusk",
+      "breakpoints": true
     }
   ]
 }

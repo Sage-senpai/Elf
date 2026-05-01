@@ -79,7 +79,9 @@ export const coworkRouter = new Hono()
         content: m.content
       }));
 
-    const inference = getInferenceProvider("anthropic");
+    // Use Groq if available (free!), fall back to Anthropic
+    const provider = process.env.GROQ_API_KEY ? "groq" : "anthropic";
+    const inference = getInferenceProvider(provider);
     const tools = buildCoworkTools({
       workspaceId: c.var.workspace.id,
       workspaceCodename: c.var.workspace.codename,

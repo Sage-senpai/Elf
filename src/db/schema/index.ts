@@ -7,5 +7,6 @@ export * from "./forks";
 export * from "./cowork";
 export * from "./activity";
 export * from "./treasury";
+export * from "./wallets";
 export * from "./zg";
 export * from "./mcp";

@@ -223,6 +223,157 @@ class AnthropicInferenceProvider implements InferenceProvider {
 }
 
 /**
+ * Groq inference — free API with no rate limits, supports tool-use.
+ * Uses Groq's OpenAI-compatible endpoint for instant responses.
+ *
+ * Models available:
+ *  - mixtral-8x7b-32768 (best quality, 32k context)
+ *  - llama-2-70b-chat (very capable)
+ *  - gemma-7b-it (fast)
+ */
+class GroqInferenceProvider implements InferenceProvider {
+  readonly kind = "anthropic" as const;
+  private readonly defaultModel = "mixtral-8x7b-32768";
+
+  private async client(): Promise<Anthropic> {
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error(
+        "GROQ_API_KEY is not set. Get one free at https://console.groq.com/keys"
+      );
+    }
+    // Reuse Anthropic SDK for compatibility (Groq endpoint is compatible)
+    const { default: AnthropicSDK } = await import("@anthropic-ai/sdk");
+    return new AnthropicSDK({
+      apiKey: process.env.GROQ_API_KEY,
+      baseURL: "https://api.groq.com/openai/v1"
+    }) as Anthropic;
+  }
+
+  async generate(req: InferenceRequest): Promise<InferenceResponse> {
+    const client = await this.client();
+    const response = await client.messages.create({
+      model: req.model ?? this.defaultModel,
+      system: req.system,
+      max_tokens: req.maxTokens ?? 1024,
+      messages: req.messages.map((m) => ({ role: m.role, content: m.content }))
+    });
+    const text = response.content
+      .filter((b): b is import("@anthropic-ai/sdk").default.TextBlock => b.type === "text")
+      .map((b) => b.text)
+      .join("\n");
+    return {
+      content: text,
+      stopReason: response.stop_reason ?? undefined,
+      inputTokens: response.usage?.input_tokens,
+      outputTokens: response.usage?.output_tokens
+    };
+  }
+
+  async *streamGenerate(req: InferenceRequest): AsyncIterable<StreamEvent> {
+    const client = await this.client();
+    const tools = req.tools ?? [];
+    const toolDefs = tools.map((t) => ({
+      name: t.name,
+      description: t.description,
+      input_schema: t.input_schema as import("@anthropic-ai/sdk").default.Tool.InputSchema
+    }));
+    const handlerByName = new Map(tools.map((t) => [t.name, t.handler]));
+
+    const messages: import("@anthropic-ai/sdk").default.MessageParam[] = req.messages.map((m) => ({
+      role: m.role,
+      content: m.content
+    }));
+
+    for (let turn = 0; turn < 6; turn++) {
+      const stream = client.messages.stream({
+        model: req.model ?? this.defaultModel,
+        system: req.system,
+        max_tokens: req.maxTokens ?? 1024,
+        messages,
+        tools: toolDefs.length > 0 ? toolDefs : undefined
+      });
+
+      let stopReason: string | null = null;
+      const pendingToolUses: Array<{
+        id: string;
+        name: string;
+        input: Record<string, unknown>;
+      }> = [];
+      const assistantBlocks: import("@anthropic-ai/sdk").default.ContentBlockParam[] = [];
+
+      for await (const event of stream) {
+        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+          yield { type: "text", delta: event.delta.text };
+        }
+      }
+
+      const finalMessage = await stream.finalMessage();
+      stopReason = finalMessage.stop_reason ?? null;
+
+      for (const block of finalMessage.content) {
+        if (block.type === "text") {
+          assistantBlocks.push({ type: "text", text: block.text });
+        }
+        if (block.type === "tool_use") {
+          assistantBlocks.push({
+            type: "tool_use",
+            id: block.id,
+            name: block.name,
+            input: block.input as Record<string, unknown>
+          });
+          pendingToolUses.push({
+            id: block.id,
+            name: block.name,
+            input: block.input as Record<string, unknown>
+          });
+        }
+      }
+
+      messages.push({ role: "assistant", content: assistantBlocks });
+
+      if (stopReason !== "tool_use" || pendingToolUses.length === 0) {
+        yield { type: "done", stopReason: stopReason ?? undefined };
+        return;
+      }
+
+      const toolResults: import("@anthropic-ai/sdk").default.ToolResultBlockParam[] = [];
+      for (const tu of pendingToolUses) {
+        yield { type: "tool_use", name: tu.name };
+        const handler = handlerByName.get(tu.name);
+        if (!handler) {
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: tu.id,
+            is_error: true,
+            content: `Unknown tool: ${tu.name}`
+          });
+          continue;
+        }
+        try {
+          const result = await handler(tu.input);
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: tu.id,
+            content: typeof result === "string" ? result : JSON.stringify(result)
+          });
+          yield { type: "tool_result", name: tu.name };
+        } catch (err) {
+          toolResults.push({
+            type: "tool_result",
+            tool_use_id: tu.id,
+            is_error: true,
+            content: err instanceof Error ? err.message : "Tool failed"
+          });
+        }
+      }
+      messages.push({ role: "user", content: toolResults });
+    }
+
+    yield { type: "error", message: "Tool-use loop exceeded 6 turns." };
+  }
+}
+
+/**
  * Sealed inference on the 0G Compute Network. Used by the Shelf Agent so
  * its reasoning runs on a decentralised provider, not on Anthropic. Pays
  * out of the agent wallet's on-chain ZG balance via per-provider
@@ -393,9 +544,9 @@ export function pickAgentInferenceProvider(): InferenceProvider {
 }
 
 export function getInferenceProvider(
-  kind: "anthropic" | "0g-compute" = "anthropic"
+  kind: "anthropic" | "groq" | "0g-compute" = "anthropic"
 ): InferenceProvider {
-  return kind === "0g-compute"
-    ? new ZeroGComputeInferenceProvider()
-    : new AnthropicInferenceProvider();
+  if (kind === "0g-compute") return new ZeroGComputeInferenceProvider();
+  if (kind === "groq") return new GroqInferenceProvider();
+  return new AnthropicInferenceProvider();
 }
