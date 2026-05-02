@@ -18,7 +18,7 @@ export const wallets = pgTable(
     userId: uuid("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    // Chain ID: 1=Ethereum, 84532=Base, 8453=Base mainnet, 16601=0G testnet
+    // Chain ID: 1=Ethereum, 84532=Base Sepolia, 8453=Base mainnet, 16602=0G Galileo testnet
     chainId: integer("chain_id").notNull(),
     // Wallet address (lowercase, 0x-prefixed)
     address: text("address").notNull(),

@@ -642,11 +642,27 @@ class ZeroGComputeInferenceProvider implements InferenceProvider {
  * SHELF_AGENT_USE_0G_COMPUTE=true; otherwise falls back to Anthropic so
  * the agent always has a way to think.
  */
+/**
+ * Selection order for the Shelf Agent:
+ *   1. 0G Compute — only when explicitly opted in via SHELF_AGENT_USE_0G_COMPUTE=true
+ *      AND a funded AGENT_WALLET_PRIVATE_KEY is available. This is the
+ *      "decentralised" path the architecture pitches.
+ *   2. Groq — preferred default. Free, fast, and works as long as
+ *      GROQ_API_KEY is set. Most installs land here.
+ *   3. Anthropic — last-resort fallback for environments that have a
+ *      paid Claude key but no Groq.
+ *
+ * If none of the three are available, getInferenceProvider() will throw
+ * the moment the agent makes its first call, with a message naming the
+ * env var that's missing.
+ */
 export function pickAgentInferenceProvider(): InferenceProvider {
   const wantsZg =
     (process.env.SHELF_AGENT_USE_0G_COMPUTE ?? "").toLowerCase() === "true" &&
     !!process.env.AGENT_WALLET_PRIVATE_KEY;
-  return getInferenceProvider(wantsZg ? "0g-compute" : "anthropic");
+  if (wantsZg) return getInferenceProvider("0g-compute");
+  if (process.env.GROQ_API_KEY) return getInferenceProvider("groq");
+  return getInferenceProvider("anthropic");
 }
 
 export function getInferenceProvider(
