@@ -5,12 +5,14 @@ import { Logo } from "@/components/brand/Logo";
 import { HeaderActions } from "@/components/auth/HeaderActions";
 import { InviteForm } from "@/components/team/InviteForm";
 import { PendingInvites } from "@/components/team/PendingInvites";
+import { ContributionHeatmap } from "@/components/team/ContributionHeatmap";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
   getUserRole
 } from "@/db/repositories/workspaces";
 import {
+  listMemberContributions,
   listPendingInvites,
   listWorkspaceMembers
 } from "@/db/repositories/invites";
@@ -29,10 +31,16 @@ export default async function TeamPage({ params }: Props) {
   const role = await getUserRole(workspace.id, session.user.id);
   if (!role) notFound();
 
-  const [members, pending] = await Promise.all([
+  const [members, pending, contributions] = await Promise.all([
     listWorkspaceMembers(workspace.id),
-    role === "manager" ? listPendingInvites(workspace.id) : Promise.resolve([])
+    role === "manager" ? listPendingInvites(workspace.id) : Promise.resolve([]),
+    listMemberContributions(workspace.id)
   ]);
+
+  const totalContributions = Array.from(contributions.values()).reduce(
+    (sum, r) => sum + r.total,
+    0
+  );
 
   // Best-effort origin for the invite-link copy button. Falls back to
   // request origin in dev / preview deploys.
@@ -107,43 +115,71 @@ export default async function TeamPage({ params }: Props) {
           )}
 
           <div>
-            <p className="mono text-xs uppercase tracking-widest text-elf-mid mb-3">
-              members
-            </p>
+            <div className="flex items-end justify-between gap-4 flex-wrap mb-3">
+              <p className="mono text-xs uppercase tracking-widest text-elf-mid">
+                members &amp; contributions
+              </p>
+              <p className="mono text-[11px] uppercase tracking-widest text-elf-muted">
+                {totalContributions} total · last 12 weeks
+              </p>
+            </div>
             <ul className="divide-y divide-hair border-hair rounded-card">
-              {members.map((m) => (
-                <li
-                  key={m.id}
-                  className="px-4 py-3 flex items-center gap-3"
-                >
-                  {m.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={m.image}
-                      alt=""
-                      className="w-8 h-8 rounded-full border-hair"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-elf-mint/40 flex items-center justify-center text-[11px] mono text-elf-forest">
-                      {m.name.slice(0, 1).toUpperCase()}
-                    </div>
-                  )}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm text-elf-ink truncate">
-                      {m.name}
-                      {m.username ? (
-                        <span className="text-elf-muted mono text-xs ml-1.5">
-                          @{m.username}
+              {members.map((m) => {
+                const stats = contributions.get(m.userId);
+                return (
+                  <li
+                    key={m.id}
+                    className="px-4 py-4 flex items-start gap-4 flex-wrap"
+                  >
+                    {m.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={m.image}
+                        alt=""
+                        className="w-10 h-10 rounded-full border-hair shrink-0"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-elf-mint/40 flex items-center justify-center text-[12px] mono text-elf-forest shrink-0">
+                        {m.name.slice(0, 1).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                        <p className="text-sm text-elf-ink truncate">
+                          {m.name}
+                          {m.username ? (
+                            <span className="text-elf-muted mono text-xs ml-1.5">
+                              @{m.username}
+                            </span>
+                          ) : null}
+                        </p>
+                        <span className="mono text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-badge bg-elf-border/40 text-elf-muted">
+                          {m.role}
                         </span>
-                      ) : null}
-                    </p>
-                    <p className="text-xs text-elf-muted truncate">{m.email}</p>
-                  </div>
-                  <span className="mono text-[10px] uppercase tracking-widest px-2 py-1 rounded-badge bg-elf-border/40 text-elf-muted">
-                    {m.role}
-                  </span>
-                </li>
-              ))}
+                      </div>
+                      <p className="text-xs text-elf-muted truncate mb-2">
+                        {m.email}
+                      </p>
+                      <p className="mono text-[10px] uppercase tracking-widest text-elf-muted">
+                        <span className="text-elf-ink">
+                          {stats?.total ?? 0}
+                        </span>{" "}
+                        contribution{(stats?.total ?? 0) === 1 ? "" : "s"}
+                        {" · "}
+                        {stats?.codeCommits ?? 0} commits
+                        {" · "}
+                        {stats?.notes ?? 0} notes
+                        {" · "}
+                        {stats?.attachments ?? 0} refs
+                      </p>
+                    </div>
+                    <ContributionHeatmap
+                      dailyCounts={stats?.dailyCounts ?? {}}
+                      className="shrink-0"
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

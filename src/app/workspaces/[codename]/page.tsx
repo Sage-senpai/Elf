@@ -116,6 +116,13 @@ export default async function WorkspacePage({ params }: Props) {
               >
                 Team
               </Button>
+              <Button
+                href={`/workspaces/${workspace.codename}/mcp`}
+                variant="secondary"
+                size="md"
+              >
+                MCP
+              </Button>
               {projects.length > 0 && canCreate && (
                 <Button
                   href={`/workspaces/${workspace.codename}/projects/new`}

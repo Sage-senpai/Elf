@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, gte, isNull, sql } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   invites,
@@ -8,6 +8,7 @@ import {
   type Role
 } from "@/db/schema/workspaces";
 import { users } from "@/db/schema/users";
+import { commits, attachments, projects } from "@/db/schema/projects";
 
 export type InviteWithInviter = Invite & {
   inviterName: string | null;
@@ -242,5 +243,133 @@ export async function listWorkspaceMembers(workspaceId: string) {
     .innerJoin(users, eq(users.id, workspaceMembers.userId))
     .where(eq(workspaceMembers.workspaceId, workspaceId))
     .orderBy(desc(workspaceMembers.joinedAt));
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Contribution stats — per-member contribution rollup for the team page.    */
+/*  Splits commits into "code" (any non-content/docs) vs "notes" so the team  */
+/*  page can show that writers and managers are actually contributing — not   */
+/*  just sitting on the activity feed.                                        */
+/* -------------------------------------------------------------------------- */
+
+export type MemberContributionRow = {
+  userId: string;
+  codeCommits: number;
+  notes: number;
+  attachments: number;
+  total: number;
+  /** Day-bucketed counts for the last 84 days (12 weeks). Map key is the
+   *  date in `YYYY-MM-DD` form. Days with no activity are absent — render
+   *  with a falsy fallback. */
+  dailyCounts: Record<string, number>;
+};
+
+const HEATMAP_DAYS = 84;
+
+export async function listMemberContributions(
+  workspaceId: string
+): Promise<Map<string, MemberContributionRow>> {
+  const since = new Date(Date.now() - HEATMAP_DAYS * 24 * 60 * 60 * 1000);
+
+  // Commit totals split by note (content/docs) vs code.
+  const commitRows = await db
+    .select({
+      authorId: commits.authorId,
+      type: commits.type,
+      count: sql<number>`count(*)::int`
+    })
+    .from(commits)
+    .where(eq(commits.workspaceId, workspaceId))
+    .groupBy(commits.authorId, commits.type);
+
+  // Attachment totals — attachments lack workspaceId, so we join via projects.
+  const attachRows = await db
+    .select({
+      addedBy: attachments.addedBy,
+      count: sql<number>`count(*)::int`
+    })
+    .from(attachments)
+    .innerJoin(projects, eq(projects.id, attachments.projectId))
+    .where(
+      and(
+        eq(projects.workspaceId, workspaceId),
+        isNull(attachments.deletedAt)
+      )
+    )
+    .groupBy(attachments.addedBy);
+
+  // Per-day activity (commits + attachments combined). Two unioned queries
+  // would be cleaner; pulling them separately and merging avoids a second
+  // round-trip and stays fully typed.
+  const dailyCommitRows = await db
+    .select({
+      authorId: commits.authorId,
+      day: sql<string>`to_char(${commits.createdAt}::date, 'YYYY-MM-DD')`,
+      count: sql<number>`count(*)::int`
+    })
+    .from(commits)
+    .where(
+      and(
+        eq(commits.workspaceId, workspaceId),
+        gte(commits.createdAt, since)
+      )
+    )
+    .groupBy(commits.authorId, sql`${commits.createdAt}::date`);
+
+  const dailyAttachRows = await db
+    .select({
+      authorId: attachments.addedBy,
+      day: sql<string>`to_char(${attachments.createdAt}::date, 'YYYY-MM-DD')`,
+      count: sql<number>`count(*)::int`
+    })
+    .from(attachments)
+    .innerJoin(projects, eq(projects.id, attachments.projectId))
+    .where(
+      and(
+        eq(projects.workspaceId, workspaceId),
+        isNull(attachments.deletedAt),
+        gte(attachments.createdAt, since)
+      )
+    )
+    .groupBy(attachments.addedBy, sql`${attachments.createdAt}::date`);
+
+  const out = new Map<string, MemberContributionRow>();
+  function ensure(userId: string): MemberContributionRow {
+    let row = out.get(userId);
+    if (!row) {
+      row = {
+        userId,
+        codeCommits: 0,
+        notes: 0,
+        attachments: 0,
+        total: 0,
+        dailyCounts: {}
+      };
+      out.set(userId, row);
+    }
+    return row;
+  }
+
+  for (const r of commitRows) {
+    const row = ensure(r.authorId);
+    if (r.type === "content" || r.type === "docs") row.notes += r.count;
+    else row.codeCommits += r.count;
+    row.total += r.count;
+  }
+  for (const r of attachRows) {
+    const row = ensure(r.addedBy);
+    row.attachments += r.count;
+    row.total += r.count;
+  }
+  for (const r of dailyCommitRows) {
+    const row = ensure(r.authorId);
+    row.dailyCounts[r.day] = (row.dailyCounts[r.day] ?? 0) + r.count;
+  }
+  for (const r of dailyAttachRows) {
+    const row = ensure(r.authorId);
+    row.dailyCounts[r.day] = (row.dailyCounts[r.day] ?? 0) + r.count;
+  }
+
+  return out;
 }
 

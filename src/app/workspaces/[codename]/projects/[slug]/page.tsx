@@ -4,9 +4,12 @@ import { Logo } from "@/components/brand/Logo";
 import { HeaderActions } from "@/components/auth/HeaderActions";
 import { Button } from "@/components/ui/Button";
 import { CommitList } from "@/components/commits/CommitList";
+import { QuickNoteForm } from "@/components/commits/QuickNoteForm";
 import { CoworkLauncher } from "@/components/cowork/CoworkLauncher";
 import { GithubLinkCard } from "@/components/github/GithubLinkCard";
 import { RequestForkButton } from "@/components/forks/RequestForkButton";
+import { AttachmentForm } from "@/components/attachments/AttachmentForm";
+import { AttachmentList } from "@/components/attachments/AttachmentList";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -14,6 +17,7 @@ import {
 } from "@/db/repositories/workspaces";
 import { findProjectBySlug } from "@/db/repositories/projects";
 import { listProjectCommits } from "@/db/repositories/commits";
+import { listProjectAttachments } from "@/db/repositories/attachments";
 import { findUsersById } from "@/db/repositories/users";
 import { cn } from "@/lib/cn";
 
@@ -50,9 +54,21 @@ export default async function ProjectPage({ params }: Props) {
   const project = await findProjectBySlug(workspace.id, params.slug);
   if (!project) notFound();
 
-  const commits = await listProjectCommits(project.id, 30);
-  const authors = await findUsersById(commits.map((c) => c.authorId));
+  const [commits, projectAttachments] = await Promise.all([
+    listProjectCommits(project.id, 30),
+    listProjectAttachments(project.id, 30)
+  ]);
+  const authorIds = [
+    ...commits.map((c) => c.authorId),
+    ...projectAttachments.map((a) => a.addedBy)
+  ];
+  const authors = await findUsersById(authorIds);
   const canCommit = role !== "viewer";
+
+  const noteCount = commits.filter(
+    (c) => c.type === "content" || c.type === "docs"
+  ).length;
+  const codeCount = commits.length - noteCount;
 
   return (
     <main className="min-h-screen">
@@ -111,46 +127,92 @@ export default async function ProjectPage({ params }: Props) {
           </div>
 
           <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div>
-              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-                <h2 className="text-lg text-elf-forest">
-                  {commits.length === 0
-                    ? "No commits yet"
-                    : commits.length === 1
-                      ? "1 commit"
-                      : `${commits.length} commits`}
-                </h2>
+            <div className="space-y-10">
+              <div>
+                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                  <div>
+                    <h2 className="text-lg text-elf-forest">
+                      {commits.length === 0
+                        ? "No entries yet"
+                        : commits.length === 1
+                          ? "1 entry"
+                          : `${commits.length} entries`}
+                    </h2>
+                    {commits.length > 0 && (
+                      <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                        {codeCount} commit{codeCount === 1 ? "" : "s"} ·{" "}
+                        {noteCount} note{noteCount === 1 ? "" : "s"} ·{" "}
+                        {projectAttachments.length} reference
+                        {projectAttachments.length === 1 ? "" : "s"}
+                      </p>
+                    )}
+                  </div>
+                  {canCommit && (
+                    <Button
+                      href={`/workspaces/${workspace.codename}/projects/${project.slug}/commits/new`}
+                      variant="secondary"
+                      size="md"
+                    >
+                      Full commit form →
+                    </Button>
+                  )}
+                </div>
+
                 {canCommit && (
-                  <Button
-                    href={`/workspaces/${workspace.codename}/projects/${project.slug}/commits/new`}
-                    size="md"
-                  >
-                    New commit
-                  </Button>
+                  <div className="mb-5">
+                    <QuickNoteForm
+                      codename={workspace.codename}
+                      slug={project.slug}
+                    />
+                  </div>
+                )}
+
+                {commits.length === 0 ? (
+                  <div className="border-hair rounded-card p-8">
+                    <p className="text-sm text-elf-muted leading-relaxed mb-3">
+                      Anyone on the team contributes here — devs ship commits,
+                      writers post notes, designers drop refs. Everything lands
+                      in the same audit log, in plain English.
+                    </p>
+                    {!canCommit && (
+                      <p className="text-xs text-elf-muted">
+                        Viewers read but don&apos;t post. Ask a manager to bump
+                        your role if you want to contribute.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <CommitList commits={commits} authorById={authors} />
                 )}
               </div>
 
-              {commits.length === 0 ? (
-                <div className="border-hair rounded-card p-8">
-                  <p className="text-sm text-elf-muted leading-relaxed mb-3">
-                    Once you commit — a feature, a fix, a content draft —
-                    it lands here in plain English. Every commit also becomes
-                    a tamper-proof entry in this project&apos;s permanent
-                    audit log.
-                  </p>
-                  {canCommit ? (
-                    <p className="text-xs text-elf-muted">
-                      Click &ldquo;New commit&rdquo; above to record your first.
+              <div>
+                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                  <div>
+                    <h2 className="text-lg text-elf-forest">
+                      References &amp; attachments
+                    </h2>
+                    <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                      briefs · decks · figma · the original idea
                     </p>
-                  ) : (
-                    <p className="text-xs text-elf-muted">
-                      Viewers can&apos;t author commits — ask a manager or dev to write the first.
-                    </p>
-                  )}
+                  </div>
                 </div>
-              ) : (
-                <CommitList commits={commits} authorById={authors} />
-              )}
+                {canCommit && (
+                  <div className="mb-5">
+                    <AttachmentForm
+                      codename={workspace.codename}
+                      slug={project.slug}
+                    />
+                  </div>
+                )}
+                <AttachmentList
+                  codename={workspace.codename}
+                  slug={project.slug}
+                  attachments={projectAttachments}
+                  authorById={authors}
+                  canEdit={canCommit}
+                />
+              </div>
             </div>
 
             <aside className="space-y-6">

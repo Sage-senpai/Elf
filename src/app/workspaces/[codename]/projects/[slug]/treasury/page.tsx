@@ -70,6 +70,14 @@ export default async function TreasuryPage({ params }: Props) {
   const transactions = await listTreasuryTransactions(existing.id, 30);
   const recipientNames = await findUsersById(payments.map((p) => p.recipientId));
 
+  const settledPayments = payments.filter((p) => p.status === "settled");
+  const totalVolume = settledPayments.reduce(
+    (sum, p) => sum + Number(p.amountUsdc || 0),
+    0
+  );
+  const txCount = transactions.length;
+  const contributorsPaid = new Set(settledPayments.map((p) => p.recipientId)).size;
+
   return (
     <Shell workspace={workspace} project={project} session={session}>
       <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
@@ -80,6 +88,13 @@ export default async function TreasuryPage({ params }: Props) {
             source={balance.source}
             walletAddress={existing.walletAddress}
             chainId={existing.chainId}
+          />
+
+          <VolumeStrip
+            totalVolume={totalVolume}
+            paymentsCount={settledPayments.length}
+            txCount={txCount}
+            contributorsPaid={contributorsPaid}
           />
 
           {isManager && (
@@ -254,6 +269,66 @@ function BalanceCard({
       </p>
       <p className="mono text-xs text-elf-muted mt-4 break-all">
         {walletAddress}
+      </p>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Volume strip                                                              */
+/* -------------------------------------------------------------------------- */
+
+function VolumeStrip({
+  totalVolume,
+  paymentsCount,
+  txCount,
+  contributorsPaid
+}: {
+  totalVolume: number;
+  paymentsCount: number;
+  txCount: number;
+  contributorsPaid: number;
+}) {
+  const formatted = totalVolume.toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <Stat label="Lifetime volume" value={`$${formatted}`} accent />
+      <Stat label="Payments settled" value={String(paymentsCount)} />
+      <Stat label="On-chain txs" value={String(txCount)} />
+      <Stat label="Contributors paid" value={String(contributorsPaid)} />
+    </div>
+  );
+}
+
+function Stat({
+  label,
+  value,
+  accent
+}: {
+  label: string;
+  value: string;
+  accent?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "border-hair rounded-card p-4",
+        accent && "bg-elf-mint/15"
+      )}
+    >
+      <p className="mono text-[10px] uppercase tracking-widest text-elf-mid mb-2">
+        {label}
+      </p>
+      <p
+        className={cn(
+          "display leading-none",
+          accent ? "text-2xl text-elf-forest" : "text-xl text-elf-ink"
+        )}
+      >
+        {value}
       </p>
     </div>
   );

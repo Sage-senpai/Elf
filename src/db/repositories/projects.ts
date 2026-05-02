@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull } from "drizzle-orm";
 import { db } from "@/db/client";
 import {
   projects,
@@ -128,6 +128,20 @@ export async function findProjectBySlug(
     )
     .limit(1);
   return row ?? null;
+}
+
+/**
+ * Every active project that has a linked GitHub repo. Used by the cron
+ * scheduler to fan out auto-syncs across the whole platform.
+ */
+export async function listProjectsWithGithub(): Promise<Project[]> {
+  return db
+    .select()
+    .from(projects)
+    .where(
+      and(isNull(projects.deletedAt), isNotNull(projects.githubRepo))
+    )
+    .orderBy(desc(projects.updatedAt));
 }
 
 /**

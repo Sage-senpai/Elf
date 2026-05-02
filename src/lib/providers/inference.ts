@@ -250,8 +250,21 @@ type OpenAIMessage =
 
 class GroqInferenceProviderImpl implements InferenceProvider {
   readonly kind = "groq" as const;
-  private readonly defaultModel =
-    process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+  // Auto-substitute Groq models that have been decommissioned upstream.
+  // Without this, a stale GROQ_MODEL on a deployed environment would
+  // crash Cowork with a 400 even though the new code is correct.
+  private static readonly DECOMMISSIONED = new Set([
+    "mixtral-8x7b-32768",
+    "llama-2-70b-chat",
+    "gemma-7b-it"
+  ]);
+  private readonly defaultModel = (() => {
+    const envModel = process.env.GROQ_MODEL;
+    if (envModel && !GroqInferenceProviderImpl.DECOMMISSIONED.has(envModel)) {
+      return envModel;
+    }
+    return "llama-3.3-70b-versatile";
+  })();
   private readonly endpoint = "https://api.groq.com/openai/v1/chat/completions";
 
   private apiKey(): string {

@@ -41,6 +41,9 @@ export function GithubLinkCard({ codename, slug, initialRepo, canEdit }: Props) 
           >
             {linked}
           </a>
+          <p className="mono text-[10px] uppercase tracking-widest text-elf-muted mt-2">
+            auto-syncs every 30 min
+          </p>
           {canEdit && (
             <div className="mt-4 space-y-3">
               <SyncButton codename={codename} slug={slug} onSynced={() => router.refresh()} />
