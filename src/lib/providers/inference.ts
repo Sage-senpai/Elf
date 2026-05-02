@@ -56,7 +56,7 @@ export type StreamEvent =
   | { type: "error"; message: string };
 
 export interface InferenceProvider {
-  readonly kind: "anthropic" | "0g-compute";
+  readonly kind: "anthropic" | "groq" | "0g-compute";
   generate(req: InferenceRequest): Promise<InferenceResponse>;
   streamGenerate(req: InferenceRequest): AsyncIterable<StreamEvent>;
 }
@@ -223,155 +223,261 @@ class AnthropicInferenceProvider implements InferenceProvider {
 }
 
 /**
- * Groq inference — free API with no rate limits, supports tool-use.
- * Uses Groq's OpenAI-compatible endpoint for instant responses.
+ * Groq inference — free, OpenAI-compatible chat completions.
  *
- * Models available:
- *  - mixtral-8x7b-32768 (best quality, 32k context)
- *  - llama-2-70b-chat (very capable)
- *  - gemma-7b-it (fast)
+ * Endpoint: https://api.groq.com/openai/v1/chat/completions
+ * Auth:     Authorization: Bearer GROQ_API_KEY
+ *
+ * The schema differs from Anthropic, so this provider speaks OpenAI on the
+ * wire and adapts back to the shared StreamEvent format the Cowork UI
+ * expects. Tool-use is supported via OpenAI's function-calling protocol.
+ *
+ * Default model: llama-3.3-70b-versatile (strong + supports tool-use).
+ * Override via GROQ_MODEL env var. mixtral-8x7b-32768 is deprecated.
  */
-class GroqInferenceProvider implements InferenceProvider {
-  readonly kind = "anthropic" as const;
-  private readonly defaultModel = "mixtral-8x7b-32768";
+type OpenAIMessage =
+  | { role: "system" | "user"; content: string }
+  | {
+      role: "assistant";
+      content: string | null;
+      tool_calls?: Array<{
+        id: string;
+        type: "function";
+        function: { name: string; arguments: string };
+      }>;
+    }
+  | { role: "tool"; tool_call_id: string; content: string };
 
-  private async client(): Promise<Anthropic> {
-    if (!process.env.GROQ_API_KEY) {
+class GroqInferenceProviderImpl implements InferenceProvider {
+  readonly kind = "groq" as const;
+  private readonly defaultModel =
+    process.env.GROQ_MODEL ?? "llama-3.3-70b-versatile";
+  private readonly endpoint = "https://api.groq.com/openai/v1/chat/completions";
+
+  private apiKey(): string {
+    const key = process.env.GROQ_API_KEY;
+    if (!key) {
       throw new Error(
-        "GROQ_API_KEY is not set. Get one free at https://console.groq.com/keys"
+        "GROQ_API_KEY is not set. Get a free key at https://console.groq.com/keys"
       );
     }
-    // Reuse Anthropic SDK for compatibility (Groq endpoint is compatible)
-    const { default: AnthropicSDK } = await import("@anthropic-ai/sdk");
-    return new AnthropicSDK({
-      apiKey: process.env.GROQ_API_KEY,
-      baseURL: "https://api.groq.com/openai/v1"
-    }) as Anthropic;
+    return key;
+  }
+
+  private toolDefs(req: InferenceRequest) {
+    if (!req.tools || req.tools.length === 0) return undefined;
+    return req.tools.map((t) => ({
+      type: "function" as const,
+      function: {
+        name: t.name,
+        description: t.description,
+        parameters: t.input_schema
+      }
+    }));
+  }
+
+  private buildMessages(req: InferenceRequest): OpenAIMessage[] {
+    const out: OpenAIMessage[] = [];
+    if (req.system) out.push({ role: "system", content: req.system });
+    for (const m of req.messages) {
+      out.push({ role: m.role, content: m.content });
+    }
+    return out;
   }
 
   async generate(req: InferenceRequest): Promise<InferenceResponse> {
-    const client = await this.client();
-    const response = await client.messages.create({
-      model: req.model ?? this.defaultModel,
-      system: req.system,
-      max_tokens: req.maxTokens ?? 1024,
-      messages: req.messages.map((m) => ({ role: m.role, content: m.content }))
+    const res = await fetch(this.endpoint, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${this.apiKey()}`
+      },
+      body: JSON.stringify({
+        model: req.model ?? this.defaultModel,
+        max_tokens: req.maxTokens ?? 1024,
+        messages: this.buildMessages(req),
+        tools: this.toolDefs(req)
+      })
     });
-    const text = response.content
-      .filter((b): b is import("@anthropic-ai/sdk").default.TextBlock => b.type === "text")
-      .map((b) => b.text)
-      .join("\n");
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(`Groq HTTP ${res.status}: ${text.slice(0, 300)}`);
+    }
+    const json = (await res.json()) as {
+      choices?: Array<{ message?: { content?: string }; finish_reason?: string }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
+    };
     return {
-      content: text,
-      stopReason: response.stop_reason ?? undefined,
-      inputTokens: response.usage?.input_tokens,
-      outputTokens: response.usage?.output_tokens
+      content: json.choices?.[0]?.message?.content ?? "",
+      stopReason: json.choices?.[0]?.finish_reason,
+      inputTokens: json.usage?.prompt_tokens,
+      outputTokens: json.usage?.completion_tokens
     };
   }
 
   async *streamGenerate(req: InferenceRequest): AsyncIterable<StreamEvent> {
-    const client = await this.client();
     const tools = req.tools ?? [];
-    const toolDefs = tools.map((t) => ({
-      name: t.name,
-      description: t.description,
-      input_schema: t.input_schema as import("@anthropic-ai/sdk").default.Tool.InputSchema
-    }));
     const handlerByName = new Map(tools.map((t) => [t.name, t.handler]));
-
-    const messages: import("@anthropic-ai/sdk").default.MessageParam[] = req.messages.map((m) => ({
-      role: m.role,
-      content: m.content
-    }));
+    const messages = this.buildMessages(req);
 
     for (let turn = 0; turn < 6; turn++) {
-      const stream = client.messages.stream({
-        model: req.model ?? this.defaultModel,
-        system: req.system,
-        max_tokens: req.maxTokens ?? 1024,
-        messages,
-        tools: toolDefs.length > 0 ? toolDefs : undefined
+      const res = await fetch(this.endpoint, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${this.apiKey()}`
+        },
+        body: JSON.stringify({
+          model: req.model ?? this.defaultModel,
+          max_tokens: req.maxTokens ?? 1024,
+          messages,
+          tools: this.toolDefs(req),
+          stream: true
+        })
       });
-
-      let stopReason: string | null = null;
-      const pendingToolUses: Array<{
-        id: string;
-        name: string;
-        input: Record<string, unknown>;
-      }> = [];
-      const assistantBlocks: import("@anthropic-ai/sdk").default.ContentBlockParam[] = [];
-
-      for await (const event of stream) {
-        if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
-          yield { type: "text", delta: event.delta.text };
-        }
-      }
-
-      const finalMessage = await stream.finalMessage();
-      stopReason = finalMessage.stop_reason ?? null;
-
-      for (const block of finalMessage.content) {
-        if (block.type === "text") {
-          assistantBlocks.push({ type: "text", text: block.text });
-        }
-        if (block.type === "tool_use") {
-          assistantBlocks.push({
-            type: "tool_use",
-            id: block.id,
-            name: block.name,
-            input: block.input as Record<string, unknown>
-          });
-          pendingToolUses.push({
-            id: block.id,
-            name: block.name,
-            input: block.input as Record<string, unknown>
-          });
-        }
-      }
-
-      messages.push({ role: "assistant", content: assistantBlocks });
-
-      if (stopReason !== "tool_use" || pendingToolUses.length === 0) {
-        yield { type: "done", stopReason: stopReason ?? undefined };
+      if (!res.ok || !res.body) {
+        const text = await res.text().catch(() => "");
+        yield {
+          type: "error",
+          message: `Groq HTTP ${res.status}: ${text.slice(0, 300)}`
+        };
         return;
       }
 
-      const toolResults: import("@anthropic-ai/sdk").default.ToolResultBlockParam[] = [];
-      for (const tu of pendingToolUses) {
-        yield { type: "tool_use", name: tu.name };
-        const handler = handlerByName.get(tu.name);
+      // Reassemble streamed text + tool calls from SSE deltas.
+      let assistantText = "";
+      // tool_calls deltas come in as { index, id?, function: { name?, arguments? } }
+      // and we have to merge them per index into a final shape.
+      const toolCallsByIndex = new Map<
+        number,
+        { id?: string; name: string; argsJson: string }
+      >();
+      let finishReason: string | null = null;
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // SSE events are separated by \n\n; each event has data: <json> lines.
+        let nlIdx;
+        while ((nlIdx = buffer.indexOf("\n")) !== -1) {
+          const line = buffer.slice(0, nlIdx).trim();
+          buffer = buffer.slice(nlIdx + 1);
+          if (!line.startsWith("data:")) continue;
+          const payload = line.slice(5).trim();
+          if (payload === "[DONE]") break;
+          let event: {
+            choices?: Array<{
+              delta?: {
+                content?: string;
+                tool_calls?: Array<{
+                  index: number;
+                  id?: string;
+                  function?: { name?: string; arguments?: string };
+                }>;
+              };
+              finish_reason?: string;
+            }>;
+          };
+          try {
+            event = JSON.parse(payload);
+          } catch {
+            continue;
+          }
+          const choice = event.choices?.[0];
+          const delta = choice?.delta;
+          if (delta?.content) {
+            assistantText += delta.content;
+            yield { type: "text", delta: delta.content };
+          }
+          if (delta?.tool_calls) {
+            for (const tc of delta.tool_calls) {
+              const slot = toolCallsByIndex.get(tc.index) ?? {
+                id: undefined,
+                name: "",
+                argsJson: ""
+              };
+              if (tc.id) slot.id = tc.id;
+              if (tc.function?.name) slot.name = tc.function.name;
+              if (tc.function?.arguments) slot.argsJson += tc.function.arguments;
+              toolCallsByIndex.set(tc.index, slot);
+            }
+          }
+          if (choice?.finish_reason) finishReason = choice.finish_reason;
+        }
+      }
+
+      // No tool calls → we're done.
+      if (toolCallsByIndex.size === 0) {
+        yield { type: "done", stopReason: finishReason ?? undefined };
+        return;
+      }
+
+      // Push the assistant turn (with text + tool_calls) onto history.
+      const assistantToolCalls = Array.from(toolCallsByIndex.entries())
+        .sort(([a], [b]) => a - b)
+        .map(([, slot]) => ({
+          id: slot.id ?? `call_${Math.random().toString(36).slice(2)}`,
+          type: "function" as const,
+          function: { name: slot.name, arguments: slot.argsJson || "{}" }
+        }));
+      messages.push({
+        role: "assistant",
+        content: assistantText || null,
+        tool_calls: assistantToolCalls
+      });
+
+      // Run each tool, push the result back as a `tool` message.
+      for (const tc of assistantToolCalls) {
+        yield { type: "tool_use", name: tc.function.name };
+        const handler = handlerByName.get(tc.function.name);
         if (!handler) {
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: tu.id,
-            is_error: true,
-            content: `Unknown tool: ${tu.name}`
+          messages.push({
+            role: "tool",
+            tool_call_id: tc.id,
+            content: `Unknown tool: ${tc.function.name}`
           });
           continue;
         }
+        let parsedArgs: Record<string, unknown> = {};
         try {
-          const result = await handler(tu.input);
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: tu.id,
+          parsedArgs = JSON.parse(tc.function.arguments) as Record<string, unknown>;
+        } catch {
+          /* keep empty */
+        }
+        try {
+          const result = await handler(parsedArgs);
+          messages.push({
+            role: "tool",
+            tool_call_id: tc.id,
             content: typeof result === "string" ? result : JSON.stringify(result)
           });
-          yield { type: "tool_result", name: tu.name };
+          yield { type: "tool_result", name: tc.function.name };
         } catch (err) {
-          toolResults.push({
-            type: "tool_result",
-            tool_use_id: tu.id,
-            is_error: true,
+          messages.push({
+            role: "tool",
+            tool_call_id: tc.id,
             content: err instanceof Error ? err.message : "Tool failed"
           });
         }
       }
-      messages.push({ role: "user", content: toolResults });
+      // loop and let the model continue with the tool results.
     }
 
     yield { type: "error", message: "Tool-use loop exceeded 6 turns." };
   }
 }
+
+/**
+ * Old Groq class — kept as alias so the rest of the file still references
+ * `GroqInferenceProvider`. The implementation is the OpenAI-format one
+ * defined above.
+ */
+class GroqInferenceProvider extends GroqInferenceProviderImpl {}
 
 /**
  * Sealed inference on the 0G Compute Network. Used by the Shelf Agent so

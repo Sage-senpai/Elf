@@ -30,6 +30,7 @@
     "ethers": "^6.16.0",
     "hono": "^4.12.15",
     "next": "14.2.35",
+    "nodemailer": "^8.0.7",
     "postgres": "^3.4.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.0",
+    "@types/nodemailer": "^8.0.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",
