@@ -17,9 +17,9 @@ const company = [
 
 export function Footer() {
   return (
-    <footer className="px-6 py-16 border-t border-hair">
+    <footer className="px-5 sm:px-6 py-12 sm:py-16 border-t border-hair">
       <div className="mx-auto max-w-shell">
-        <div className="grid gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-[1.5fr_1fr_1fr] md:gap-12">
           <div>
             <Logo size={28} />
             <p className="mt-4 text-sm text-elf-muted leading-relaxed max-w-xs">
@@ -35,13 +35,14 @@ export function Footer() {
 
         {/* Sleeping elf — the SVG includes the "leave it to elf." tagline,
             so the bottom row stays minimal to avoid duplicating it. */}
-        <div className="flex justify-center mt-16 mb-6">
+        <div className="flex justify-center mt-12 sm:mt-16 mb-6">
           <img
             src="/illustrations/footer-sleeping-elf.svg"
             alt=""
             width={300}
             height={150}
             loading="lazy"
+            className="w-full max-w-[260px] sm:max-w-[300px] h-auto"
           />
         </div>
 

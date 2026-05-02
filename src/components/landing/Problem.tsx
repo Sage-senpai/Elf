@@ -40,8 +40,8 @@ export function Problem() {
 
         <div className="grid gap-px bg-elf-border md:grid-cols-3">
           {friction.map((item) => (
-            <div key={item.metric} className="bg-elf-warm-white p-8 md:p-10">
-              <p className="display text-4xl md:text-5xl text-elf-deep leading-none mb-4">
+            <div key={item.metric} className="bg-elf-warm-white p-6 sm:p-8 md:p-10">
+              <p className="display text-[2.25rem] sm:text-4xl md:text-5xl text-elf-deep leading-none mb-4">
                 {item.metric}
               </p>
               <p className="text-elf-muted leading-relaxed">{item.body}</p>

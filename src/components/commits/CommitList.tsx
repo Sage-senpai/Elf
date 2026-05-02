@@ -29,18 +29,18 @@ export function CommitRow({
 }) {
   const meta = getCommitTypeMeta(commit.type);
   return (
-    <article className="border-hair rounded-card p-5 bg-elf-warm-white">
-      <div className="flex items-center gap-3 mb-2.5 flex-wrap">
+    <article className="border-hair rounded-card p-4 sm:p-5 bg-elf-warm-white">
+      <div className="flex items-center gap-x-2 gap-y-1.5 mb-2.5 flex-wrap">
         <TypeBadge type={commit.type} breaking={commit.isBreaking} />
         {commit.scope && (
           <span className="mono text-xs text-elf-muted">{commit.scope}</span>
         )}
-        <span className="text-elf-border">·</span>
+        <span className="text-elf-border hidden sm:inline">·</span>
         <span className="text-xs text-elf-ink">{author ?? "—"}</span>
         <span className="text-elf-border">·</span>
         <span className="text-xs text-elf-muted">{relative(commit.createdAt)}</span>
         {commit.githubSha && (
-          <span className="ml-auto mono text-xs text-elf-muted">
+          <span className="sm:ml-auto mono text-xs text-elf-muted shrink-0">
             #{commit.githubSha.slice(0, 7)}
           </span>
         )}

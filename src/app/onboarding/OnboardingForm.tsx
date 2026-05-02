@@ -16,9 +16,9 @@ export function OnboardingForm({ user }: { user: UserSettings }) {
       <p className="text-sm text-elf-muted">
         Pick one role, or combine two if you move between functions.
       </p>
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-2">
         {roles.map((role) => (
-          <label key={role.value} className="border-hair rounded-card p-5 cursor-pointer">
+          <label key={role.value} className="border-hair rounded-card p-4 sm:p-5 cursor-pointer">
             <input
               type="checkbox"
               name="roles"

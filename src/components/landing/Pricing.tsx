@@ -82,7 +82,7 @@ export function Pricing() {
             <article
               key={plan.name}
               className={cn(
-                "rounded-card p-7 md:p-8 flex flex-col",
+                "rounded-card p-6 sm:p-7 md:p-8 flex flex-col",
                 plan.highlight
                   ? "bg-elf-forest text-elf-warm-white"
                   : "border-hair bg-elf-warm-white"

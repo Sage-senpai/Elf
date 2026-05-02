@@ -294,7 +294,7 @@ function VolumeStrip({
     maximumFractionDigits: 2
   });
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
       <Stat label="Lifetime volume" value={`$${formatted}`} accent />
       <Stat label="Payments settled" value={String(paymentsCount)} />
       <Stat label="On-chain txs" value={String(txCount)} />
@@ -315,11 +315,11 @@ function Stat({
   return (
     <div
       className={cn(
-        "border-hair rounded-card p-4",
+        "border-hair rounded-card p-3 sm:p-4 min-w-0",
         accent && "bg-elf-mint/15"
       )}
     >
-      <p className="mono text-[10px] uppercase tracking-widest text-elf-mid mb-2">
+      <p className="mono text-[10px] uppercase tracking-widest text-elf-mid mb-2 truncate">
         {label}
       </p>
       <p

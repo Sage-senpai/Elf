@@ -115,7 +115,7 @@ export function HeaderShell({ user }: Props) {
             {user ? (
               <UserMenu user={user} />
             ) : (
-              <Button href="/sign-in" size="md" className="hidden sm:inline-flex">
+              <Button href="/sign-in" size="md">
                 Sign in
               </Button>
             )}
