@@ -10,6 +10,8 @@ import { GithubLinkCard } from "@/components/github/GithubLinkCard";
 import { RequestForkButton } from "@/components/forks/RequestForkButton";
 import { AttachmentForm } from "@/components/attachments/AttachmentForm";
 import { AttachmentList } from "@/components/attachments/AttachmentList";
+import { ProjectMembersPanel } from "@/components/projects/ProjectMembersPanel";
+import { listProjectMembers } from "@/db/repositories/permissions";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -54,9 +56,12 @@ export default async function ProjectPage({ params }: Props) {
   const project = await findProjectBySlug(workspace.id, params.slug);
   if (!project) notFound();
 
-  const [commits, projectAttachments] = await Promise.all([
+  const [commits, projectAttachments, projectMembers] = await Promise.all([
     listProjectCommits(project.id, 30),
-    listProjectAttachments(project.id, 30)
+    listProjectAttachments(project.id, 30),
+    role === "manager"
+      ? listProjectMembers(workspace.id, project.id)
+      : Promise.resolve([])
   ]);
   const authorIds = [
     ...commits.map((c) => c.authorId),
@@ -185,6 +190,26 @@ export default async function ProjectPage({ params }: Props) {
                   <CommitList commits={commits} authorById={authors} />
                 )}
               </div>
+
+              {role === "manager" && projectMembers.length > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                    <div>
+                      <h2 className="text-lg text-elf-forest">
+                        Project members
+                      </h2>
+                      <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                        per-project role overrides · workspace defaults apply otherwise
+                      </p>
+                    </div>
+                  </div>
+                  <ProjectMembersPanel
+                    codename={workspace.codename}
+                    slug={project.slug}
+                    initialMembers={projectMembers}
+                  />
+                </div>
+              )}
 
               <div>
                 <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">

@@ -18,6 +18,7 @@ import {
   markPaymentSettled,
   markPaymentFailed,
   recordTreasuryTransaction,
+  isExternalTreasury,
   type ProjectTreasury
 } from "@/db/repositories/treasuries";
 
@@ -96,11 +97,14 @@ function usdcFor(chainId: number): `0x${string}` {
 export async function ensureTreasury(input: {
   workspaceId: string;
   projectId: string;
+  externalWalletAddress?: `0x${string}` | null;
 }): Promise<ProjectTreasury> {
   const existing = await findTreasuryByProject(input.projectId);
   if (existing) return existing;
   return createTreasury(input);
 }
+
+export { isExternalTreasury };
 
 export async function getTreasuryForProject(
   projectId: string
@@ -182,6 +186,11 @@ export type PayContributorInput = {
 export async function payContributor(
   input: PayContributorInput
 ): Promise<{ payment: Awaited<ReturnType<typeof createPayment>>; txHash?: string }> {
+  if (isExternalTreasury(input.treasury)) {
+    throw new Error(
+      "This treasury is user-custodied. Send USDC directly from your connected wallet, then record the tx hash here."
+    );
+  }
   const tokenOut = (input.tokenOut ?? "USDC").toUpperCase();
   const swapRequired = tokenOut !== "USDC";
 

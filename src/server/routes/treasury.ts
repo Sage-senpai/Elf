@@ -51,9 +51,28 @@ export const treasuryRouter = new Hono()
     if (c.var.workspaceRole !== "manager") {
       return c.json({ error: "forbidden", reason: "manager_only" }, 403);
     }
+    // Optional body: { externalWalletAddress?: "0x..." } — when present, the
+    // treasury is user-custodied (no server-stored private key, no auto-pay).
+    let externalWalletAddress: `0x${string}` | undefined;
+    try {
+      const text = await c.req.text();
+      if (text) {
+        const parsed = JSON.parse(text);
+        if (typeof parsed.externalWalletAddress === "string") {
+          if (!isAddress(parsed.externalWalletAddress)) {
+            return c.json({ error: "invalid_address" }, 400);
+          }
+          externalWalletAddress = parsed.externalWalletAddress as `0x${string}`;
+        }
+      }
+    } catch {
+      // No body or non-JSON — fall through to managed-wallet creation.
+    }
+
     const treasury = await ensureTreasury({
       workspaceId: c.var.workspace.id,
-      projectId: c.var.project.id
+      projectId: c.var.project.id,
+      externalWalletAddress: externalWalletAddress ?? null
     });
     return c.json({ treasury: stripPrivate(treasury) }, 201);
   })

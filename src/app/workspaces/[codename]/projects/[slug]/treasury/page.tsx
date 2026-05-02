@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Logo } from "@/components/brand/Logo";
 import { HeaderActions } from "@/components/auth/HeaderActions";
-import { Button } from "@/components/ui/Button";
 import { requireSession } from "@/lib/auth/session";
 import {
   findWorkspaceByCodename,
@@ -21,6 +20,7 @@ import {
 import { findUsersById } from "@/db/repositories/users";
 import { PayContributorForm } from "./PayContributorForm";
 import { DepositCard } from "./DepositCard";
+import { SetupForm } from "./SetupForm";
 import { cn } from "@/lib/cn";
 
 type Props = {
@@ -213,18 +213,6 @@ function SetupTreasury({
   );
 }
 
-function SetupForm({ codename, slug }: { codename: string; slug: string }) {
-  return (
-    <form
-      method="post"
-      action={`/api/workspaces/${codename}/projects/${slug}/treasury`}
-    >
-      <Button type="submit" size="md">
-        Set up treasury
-      </Button>
-    </form>
-  );
-}
 
 /* -------------------------------------------------------------------------- */
 /*  Balance card                                                              */

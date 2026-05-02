@@ -28,11 +28,40 @@ const DEFAULT_CHAIN_ID = Number(process.env.UNISWAP_CHAIN_ID ?? 84532);
 export type CreateTreasuryInput = {
   workspaceId: string;
   projectId: string;
+  /**
+   * When set, treats this treasury as user-custodied:
+   *   - skips private-key generation
+   *   - stores `EXTERNAL` as the encrypted-key sentinel
+   *   - server-side payouts are blocked; the manager must sign payments
+   *     with their own wallet from the UI
+   */
+  externalWalletAddress?: `0x${string}` | null;
 };
+
+/** Sentinel stored in `encrypted_private_key` for user-custodied treasuries. */
+export const EXTERNAL_WALLET_SENTINEL = "EXTERNAL";
+
+export function isExternalTreasury(t: ProjectTreasury): boolean {
+  return t.encryptedPrivateKey === EXTERNAL_WALLET_SENTINEL;
+}
 
 export async function createTreasury(
   input: CreateTreasuryInput
 ): Promise<ProjectTreasury> {
+  if (input.externalWalletAddress) {
+    const [created] = await db
+      .insert(projectTreasuries)
+      .values({
+        workspaceId: input.workspaceId,
+        projectId: input.projectId,
+        walletAddress: input.externalWalletAddress,
+        encryptedPrivateKey: EXTERNAL_WALLET_SENTINEL,
+        chainId: DEFAULT_CHAIN_ID
+      })
+      .returning();
+    return created;
+  }
+
   // Fresh hex key — viem's generatePrivateKey returns 0x-prefixed 32 bytes.
   const privateKey = generatePrivateKey();
   const account = privateKeyToAccount(privateKey);
