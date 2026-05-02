@@ -11,6 +11,7 @@ import { RequestForkButton } from "@/components/forks/RequestForkButton";
 import { AttachmentForm } from "@/components/attachments/AttachmentForm";
 import { AttachmentList } from "@/components/attachments/AttachmentList";
 import { ProjectMembersPanel } from "@/components/projects/ProjectMembersPanel";
+import { SeedDemoButton } from "@/components/projects/SeedDemoButton";
 import { listProjectMembers } from "@/db/repositories/permissions";
 import { requireSession } from "@/lib/auth/session";
 import {
@@ -190,6 +191,13 @@ export default async function ProjectPage({ params }: Props) {
                   <CommitList commits={commits} authorById={authors} />
                 )}
               </div>
+
+              {role === "manager" && (
+                <SeedDemoButton
+                  codename={workspace.codename}
+                  slug={project.slug}
+                />
+              )}
 
               {role === "manager" && projectMembers.length > 0 && (
                 <div>

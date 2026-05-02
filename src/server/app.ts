@@ -23,6 +23,7 @@ import { attachmentsRouter } from "./routes/attachments";
 import { cronRouter } from "./routes/cron";
 import { mcpServerRouter, workspaceMcpRouter } from "./routes/mcp";
 import { permissionsRouter } from "./routes/permissions";
+import { demoRouter } from "./routes/demo";
 
 /**
  * Single Hono app instance, mounted under Next.js at /api/[[...route]].
@@ -58,6 +59,7 @@ app.route(
   "/workspaces/:codename/projects/:slug/permissions",
   permissionsRouter
 );
+app.route("/workspaces/:codename/projects/:slug/demo", demoRouter);
 app.route("/mcp", mcpServerRouter);
 
 app.notFound((c) => c.json({ error: "not_found", path: c.req.path }, 404));
