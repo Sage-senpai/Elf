@@ -256,5 +256,5 @@ set, not a hackathon-only demo. We'll continue iterating on it after the
 event and we're happy to pair on whichever of the above gaps is most
 useful to fix.
 
-— *Yusuf D. & Michael C., team Elf*
+— *Divine A., team Elf*
 *Hackathon dates: ETHGlobal OpenAgents 2026*
