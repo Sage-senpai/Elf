@@ -47,11 +47,11 @@ export function SeedDemoButton({
       const r = json.result ?? {};
       if (action === "seed") {
         setResult(
-          `+${r.commits ?? 0} commits · +${r.notes ?? 0} notes · +${r.attachments ?? 0} refs · +${r.payments ?? 0} payments${r.treasuryCreated ? " · treasury created" : ""}`
+          `+${r.membersAdded ?? 0} teammates · +${r.commits ?? 0} commits · +${r.notes ?? 0} notes · +${r.attachments ?? 0} refs · +${r.payments ?? 0} payments${r.treasuryCreated ? " · treasury created" : ""}`
         );
       } else {
         setResult(
-          `−${r.commits ?? 0} commits · −${r.notes ?? 0} notes · −${r.attachments ?? 0} refs · −${r.payments ?? 0} payments · −${r.transactions ?? 0} txs`
+          `−${r.membersRemoved ?? 0} teammates · −${r.commits ?? 0} commits · −${r.notes ?? 0} notes · −${r.attachments ?? 0} refs · −${r.payments ?? 0} payments · −${r.transactions ?? 0} txs`
         );
       }
       router.refresh();
