@@ -21,20 +21,34 @@ export const demoRouter = new Hono()
     if (c.var.workspaceRole !== "manager") {
       return c.json({ error: "forbidden" }, 403);
     }
-    const result = await seedProjectDemo({
-      workspaceId: c.var.workspace.id,
-      projectId: c.var.project.id,
-      userId: c.var.userId
-    });
-    return c.json({ ok: true, result });
+    try {
+      const result = await seedProjectDemo({
+        workspaceId: c.var.workspace.id,
+        projectId: c.var.project.id,
+        userId: c.var.userId
+      });
+      return c.json({ ok: true, result });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "seed_failed";
+      // eslint-disable-next-line no-console
+      console.error("[demo/seed]", err);
+      return c.json({ error: "seed_failed", message }, 500);
+    }
   })
   .post("/wipe", async (c) => {
     if (c.var.workspaceRole !== "manager") {
       return c.json({ error: "forbidden" }, 403);
     }
-    const result = await wipeProjectDemo({
-      workspaceId: c.var.workspace.id,
-      projectId: c.var.project.id
-    });
-    return c.json({ ok: true, result });
+    try {
+      const result = await wipeProjectDemo({
+        workspaceId: c.var.workspace.id,
+        projectId: c.var.project.id
+      });
+      return c.json({ ok: true, result });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "wipe_failed";
+      // eslint-disable-next-line no-console
+      console.error("[demo/wipe]", err);
+      return c.json({ error: "wipe_failed", message }, 500);
+    }
   });

@@ -41,7 +41,7 @@ export function SeedDemoButton({
       );
       const json = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(json.error || `Couldn't ${action}.`);
+        setError(json.message || json.error || `Couldn't ${action}.`);
         return;
       }
       const r = json.result ?? {};

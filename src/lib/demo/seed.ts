@@ -317,53 +317,81 @@ function daysAgoToDate(daysAgo: number): Date {
 /**
  * Upsert a demo user by email and ensure they're a workspace member.
  * Returns the user id either way so the caller can attribute rows.
+ *
+ * Defensive against:
+ *   - existing user with the same email (re-uses it)
+ *   - existing user (real account) holding the demo username — falls
+ *     back to no username so the unique index doesn't blow up
+ *   - TOCTOU on the workspace_members upsert (onConflictDoNothing
+ *     against the unique-on-(workspace,user) constraint)
  */
 async function ensureDemoUser(
   workspaceId: string,
   spec: DemoUserSpec
 ): Promise<string> {
-  const [existing] = await db
+  // Existing demo user by email?
+  const [existingByEmail] = await db
     .select({ id: users.id })
     .from(users)
     .where(eq(users.email, spec.email))
     .limit(1);
 
   let userId: string;
-  if (existing) {
-    userId = existing.id;
+  if (existingByEmail) {
+    userId = existingByEmail.id;
   } else {
-    const [inserted] = await db
+    // Is the username we'd like already claimed by someone else?
+    const [usernameClash] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.username, spec.username))
+      .limit(1);
+
+    const inserted = await db
       .insert(users)
       .values({
         name: spec.name,
         email: spec.email,
         emailVerified: true,
-        username: spec.username,
+        username: usernameClash ? null : spec.username,
         roleProfile: spec.roleProfile
       })
+      .onConflictDoNothing({ target: users.email })
       .returning({ id: users.id });
-    userId = inserted.id;
+
+    if (inserted.length > 0) {
+      userId = inserted[0].id;
+    } else {
+      // A concurrent insert won; re-select.
+      const [refetch] = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(eq(users.email, spec.email))
+        .limit(1);
+      if (!refetch) {
+        throw new Error(
+          `ensureDemoUser: could not insert or find ${spec.email}`
+        );
+      }
+      userId = refetch.id;
+    }
   }
 
-  // Ensure workspace membership at the spec'd role; idempotent.
-  const [member] = await db
-    .select({ id: workspaceMembers.id })
-    .from(workspaceMembers)
-    .where(
-      and(
-        eq(workspaceMembers.workspaceId, workspaceId),
-        eq(workspaceMembers.userId, userId)
-      )
-    )
-    .limit(1);
-  if (!member) {
-    await db.insert(workspaceMembers).values({
+  // Ensure workspace membership; rely on the unique-on-(workspace,user)
+  // index instead of select-then-insert so two concurrent seed clicks
+  // don't blow up.
+  await db
+    .insert(workspaceMembers)
+    .values({
       workspaceId,
       userId,
       role: spec.workspaceRole,
       joinedAt: daysAgoToDate(75)
+    })
+    .onConflictDoNothing({
+      target: [workspaceMembers.workspaceId, workspaceMembers.userId]
     });
-  }
+
   return userId;
 }
 
