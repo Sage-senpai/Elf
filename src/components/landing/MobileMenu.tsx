@@ -105,7 +105,7 @@ export function MobileMenu({ open, onClose, items, user, activeSection }: Props)
               <Link
                 href="/dashboard"
                 onClick={onClose}
-                className="block w-full text-center h-11 leading-[2.75rem] rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest"
+                className="block w-full text-center h-11 leading-[2.75rem] rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest"
               >
                 Open dashboard
               </Link>
@@ -114,7 +114,7 @@ export function MobileMenu({ open, onClose, items, user, activeSection }: Props)
             <Link
               href="/sign-in"
               onClick={onClose}
-              className="block w-full text-center h-11 leading-[2.75rem] rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest"
+              className="block w-full text-center h-11 leading-[2.75rem] rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest"
             >
               Sign in
             </Link>

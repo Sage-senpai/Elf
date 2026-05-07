@@ -93,7 +93,7 @@ export function QuickNoteForm({
         <button
           type="submit"
           disabled={busy || !summary.trim()}
-          className="h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+          className="h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
         >
           {busy ? "Posting…" : "Post note"}
         </button>

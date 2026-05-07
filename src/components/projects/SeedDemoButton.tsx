@@ -80,7 +80,7 @@ export function SeedDemoButton({
             type="button"
             onClick={() => run("seed")}
             disabled={!!busy}
-            className="h-9 px-4 rounded-button bg-amber-600 text-elf-warm-white text-sm hover:bg-amber-700 disabled:opacity-50"
+            className="h-9 px-4 rounded-button bg-amber-600 text-elf-on-brand text-sm hover:bg-amber-700 disabled:opacity-50"
           >
             {busy === "seed" ? "Seeding…" : "Seed demo data"}
           </button>

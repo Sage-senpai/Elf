@@ -84,7 +84,7 @@ export function Pricing() {
               className={cn(
                 "rounded-card p-6 sm:p-7 md:p-8 flex flex-col",
                 plan.highlight
-                  ? "bg-elf-forest text-elf-warm-white"
+                  ? "bg-elf-forest text-elf-on-brand"
                   : "border-hair bg-elf-warm-white"
               )}
             >
@@ -111,7 +111,7 @@ export function Pricing() {
                       className={cn(
                         "text-sm",
                         plan.highlight
-                          ? "text-elf-warm-white/70"
+                          ? "text-elf-on-brand/70"
                           : "text-elf-muted"
                       )}
                     >
@@ -122,7 +122,7 @@ export function Pricing() {
                 <p
                   className={cn(
                     "text-sm leading-relaxed",
-                    plan.highlight ? "text-elf-warm-white/85" : "text-elf-muted"
+                    plan.highlight ? "text-elf-on-brand/85" : "text-elf-muted"
                   )}
                 >
                   {plan.tagline}
@@ -136,7 +136,7 @@ export function Pricing() {
                     className={cn(
                       "flex gap-2.5 text-sm leading-relaxed",
                       plan.highlight
-                        ? "text-elf-warm-white/85"
+                        ? "text-elf-on-brand/85"
                         : "text-elf-ink"
                     )}
                   >

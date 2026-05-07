@@ -119,7 +119,7 @@ export function SetupForm({
                 type="button"
                 onClick={() => address && setup(address)}
                 disabled={!!busy || !address}
-                className="h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+                className="h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
               >
                 {busy === "external"
                   ? "Linking…"

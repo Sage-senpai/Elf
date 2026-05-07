@@ -2,19 +2,28 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
+  // Theme switch is driven by a `class="dark"` on <html>, set by ThemeScript
+  // before hydration to avoid a flash. See src/components/theme/*.
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
+        // All elf colors flip in dark mode via the CSS variables defined
+        // in globals.css. Brand greens (forest/deep/mid/mint) get lighter,
+        // neutrals (warm-white/ink/muted/border) invert. The `on-brand`
+        // token is special — it stays cream in BOTH modes, used as text
+        // on green/dark colored buttons that don't change with the theme.
         elf: {
-          forest: "#0F3D2B",
-          deep: "#0F6E56",
-          mid: "#1D9E75",
-          mint: "#9FE1CB",
-          "warm-white": "#F1EFE8",
-          ink: "#2C2C2A",
-          muted: "#5F5E5A",
-          border: "#D3D1C7",
-          "border-mid": "#B4B2A9"
+          forest: "var(--elf-forest)",
+          deep: "var(--elf-deep)",
+          mid: "var(--elf-mid)",
+          mint: "var(--elf-mint)",
+          "warm-white": "var(--elf-warm-white)",
+          ink: "var(--elf-ink)",
+          muted: "var(--elf-muted)",
+          border: "var(--elf-border)",
+          "border-mid": "var(--elf-border-mid)",
+          "on-brand": "var(--elf-on-brand)"
         }
       },
       fontFamily: {

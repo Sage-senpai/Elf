@@ -39,7 +39,7 @@ export function CreateCommitForm({
                 key={meta.type}
                 className={`cursor-pointer border-hair rounded-input px-3 py-2.5 text-center transition-colors ${
                   checked
-                    ? "bg-elf-deep text-elf-warm-white border-elf-deep"
+                    ? "bg-elf-deep text-elf-on-brand border-elf-deep"
                     : "bg-elf-warm-white text-elf-ink hover:border-elf-deep"
                 }`}
               >

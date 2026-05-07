@@ -93,7 +93,7 @@ export function RequestForkButton({
             type="button"
             onClick={submit}
             disabled={status.kind === "submitting"}
-            className="inline-flex items-center justify-center h-10 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-60"
+            className="inline-flex items-center justify-center h-10 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-60"
           >
             {status.kind === "submitting" ? "Sending…" : "Send request"}
           </button>

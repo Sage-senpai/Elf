@@ -20,7 +20,7 @@ type Member = {
 const ROLES: Role[] = ["manager", "dev", "content", "viewer"];
 
 const ROLE_TONE: Record<Role, string> = {
-  manager: "bg-elf-deep text-elf-warm-white",
+  manager: "bg-elf-deep text-elf-on-brand",
   dev: "bg-elf-mint text-elf-forest",
   content: "bg-amber-100 text-amber-800",
   viewer: "bg-elf-border/40 text-elf-muted"

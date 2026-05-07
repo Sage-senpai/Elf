@@ -4,7 +4,13 @@
 
 /* -------------------------------------------------------------------------- */
 /*  Elf brand — warm white surface, never pure white. Forest chrome.          */
-/*  Tokens here are duplicated in tailwind.config.ts so utility classes work. */
+/*  Tokens are referenced by tailwind.config.ts via `var(--elf-*)` so the     */
+/*  same utility classes work in light and dark modes.                        */
+/*                                                                            */
+/*  Light mode (default) — original warm cream palette.                       */
+/*  Dark mode (.dark on <html>) — neutrals invert, brand greens lighten.      */
+/*  --elf-on-brand stays cream in BOTH modes; used for text on colored        */
+/*  buttons that don't theme-flip (e.g. the primary CTA).                     */
 /* -------------------------------------------------------------------------- */
 
 :root {
@@ -17,7 +23,68 @@
   --elf-muted: #5F5E5A;
   --elf-border: #D3D1C7;
   --elf-border-mid: #B4B2A9;
+  --elf-on-brand: #F1EFE8;
+
+  color-scheme: light;
 }
+
+.dark {
+  /* Brand greens — only used here for `text-elf-*` foreground readability
+     on dark surfaces. The matching `bg-elf-*` utilities are pinned to
+     light-mode values further down so colored buttons/cards stay dark
+     and high-contrast in both themes. Tones are kept moderate to avoid
+     over-exposure (no fully saturated mint headings on near-black). */
+  --elf-forest: #6BC9A2;
+  --elf-deep: #2DA982;
+  --elf-mid: #3CBC92;
+  --elf-mint: #9FE1CB;
+
+  /* Neutrals — invert. Surface is a warm near-black, foreground a soft
+     cream rather than pure white to match the brand's never-pure-white
+     ethos and reduce eye fatigue. */
+  --elf-warm-white: #161A1E;
+  --elf-ink: #E5E2D8;
+  --elf-muted: #9A968F;
+  --elf-border: #2A2E33;
+  --elf-border-mid: #41464D;
+
+  /* Always-cream text for buttons whose background stays green/dark. */
+  --elf-on-brand: #F1EFE8;
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------
+ * Dark-mode bg overrides
+ *
+ * Keep colored backgrounds at their light-mode values in dark mode so:
+ *   - bg-elf-deep / bg-elf-forest buttons stay dark green with cream text
+ *   - bg-elf-ink dark buttons (e.g. reject) stay dark with cream text
+ *   - bg-elf-mint badges stay light mint (so the dark green text on them
+ *     keeps reading)
+ * Without this, the brand greens would flip and several existing
+ * `bg-* text-*` combinations would collapse to same-color-on-same-color.
+ * -------------------------------------------------------------------------- */
+.dark .bg-elf-forest,
+.dark .hover\:bg-elf-forest:hover { background-color: #0F3D2B; }
+
+.dark .bg-elf-deep,
+.dark .hover\:bg-elf-deep:hover { background-color: #0F6E56; }
+
+.dark .bg-elf-mid,
+.dark .hover\:bg-elf-mid:hover { background-color: #1D9E75; }
+
+.dark .bg-elf-mint,
+.dark .hover\:bg-elf-mint:hover { background-color: #9FE1CB; }
+
+.dark .bg-elf-ink,
+.dark .hover\:bg-elf-ink:hover { background-color: #2C2C2A; }
+
+/* On the light-mint badge background, force text-elf-forest / text-elf-deep
+   back to dark green so the pill stays readable in dark mode. The default
+   `--elf-forest` flip (light mint) would otherwise blend into the bg. */
+.dark .bg-elf-mint .text-elf-forest,
+.dark .bg-elf-mint .text-elf-deep { color: #0F3D2B; }
 
 html,
 body {

@@ -1,4 +1,5 @@
 import { NotificationBell } from "@/components/notifications/NotificationBell";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { UserMenu } from "./UserMenu";
 
 type Props = {
@@ -17,6 +18,7 @@ type Props = {
 export function HeaderActions({ user }: Props) {
   return (
     <div className="flex items-center gap-1">
+      <ThemeToggle />
       <NotificationBell />
       <UserMenu user={user} />
     </div>

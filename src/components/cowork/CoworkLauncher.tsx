@@ -35,7 +35,7 @@ export function CoworkLauncher({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="fixed bottom-6 right-6 z-30 inline-flex items-center gap-2 px-4 py-2.5 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest shadow-[0_8px_24px_-8px_rgba(15,61,43,0.35)]"
+        className="fixed bottom-6 right-6 z-30 inline-flex items-center gap-2 px-4 py-2.5 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest shadow-[0_8px_24px_-8px_rgba(15,61,43,0.35)]"
         aria-label="Open Cowork chat"
       >
         <Sparkle />

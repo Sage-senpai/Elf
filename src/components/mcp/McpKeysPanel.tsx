@@ -113,7 +113,7 @@ export function McpKeysPanel({
           <button
             type="submit"
             disabled={busy || !name.trim()}
-            className="h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+            className="h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
           >
             {busy ? "Generating…" : "Generate key"}
           </button>
@@ -132,7 +132,7 @@ export function McpKeysPanel({
             <button
               type="button"
               onClick={() => copy(revealed.plaintext)}
-              className="shrink-0 mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-button bg-elf-deep text-elf-warm-white hover:bg-elf-forest"
+              className="shrink-0 mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-button bg-elf-deep text-elf-on-brand hover:bg-elf-forest"
             >
               Copy
             </button>

@@ -21,7 +21,7 @@ const sizes = {
 };
 const variants: Record<Variant, string> = {
   primary:
-    "bg-elf-deep text-elf-warm-white hover:bg-elf-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-elf-mint",
+    "bg-elf-deep text-elf-on-brand hover:bg-elf-forest focus:outline-none focus-visible:ring-2 focus-visible:ring-elf-mint",
   secondary:
     "border-hair text-elf-ink bg-transparent hover:bg-elf-warm-white focus:outline-none focus-visible:ring-2 focus-visible:ring-elf-mint",
   ghost:

@@ -132,123 +132,78 @@ export default async function ProjectPage({ params }: Props) {
             </div>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-            <div className="space-y-10">
-              <div>
-                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-                  <div>
-                    <h2 className="text-lg text-elf-forest">
-                      {commits.length === 0
-                        ? "No entries yet"
-                        : commits.length === 1
-                          ? "1 entry"
-                          : `${commits.length} entries`}
-                    </h2>
-                    {commits.length > 0 && (
-                      <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
-                        {codeCount} commit{codeCount === 1 ? "" : "s"} ·{" "}
-                        {noteCount} note{noteCount === 1 ? "" : "s"} ·{" "}
-                        {projectAttachments.length} reference
-                        {projectAttachments.length === 1 ? "" : "s"}
-                      </p>
-                    )}
-                  </div>
-                  {canCommit && (
-                    <Button
-                      href={`/workspaces/${workspace.codename}/projects/${project.slug}/commits/new`}
-                      variant="secondary"
-                      size="md"
-                    >
-                      Full commit form →
-                    </Button>
+          {/*
+            Top section is a 2-col grid: the audit log (entries) on the
+            left, and the sidebar (stack / github / fork / preview /
+            created) sticky on the right. Sticky requires `self-start`
+            so the aside doesn't stretch to match the entries column —
+            without it the sticky region equals the aside's full height
+            and never actually sticks.
+
+            Once the entries column ends, the grid closes and the
+            wider-than-comfortable surfaces (project members, references)
+            render below at full container width and scroll normally.
+          */}
+          <div className="grid gap-8 lg:grid-cols-[2fr_1fr] lg:items-start">
+            <div>
+              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                <div>
+                  <h2 className="text-lg text-elf-forest">
+                    {commits.length === 0
+                      ? "No entries yet"
+                      : commits.length === 1
+                        ? "1 entry"
+                        : `${commits.length} entries`}
+                  </h2>
+                  {commits.length > 0 && (
+                    <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                      {codeCount} commit{codeCount === 1 ? "" : "s"} ·{" "}
+                      {noteCount} note{noteCount === 1 ? "" : "s"} ·{" "}
+                      {projectAttachments.length} reference
+                      {projectAttachments.length === 1 ? "" : "s"}
+                    </p>
                   )}
                 </div>
-
                 {canCommit && (
-                  <div className="mb-5">
-                    <QuickNoteForm
-                      codename={workspace.codename}
-                      slug={project.slug}
-                    />
-                  </div>
-                )}
-
-                {commits.length === 0 ? (
-                  <div className="border-hair rounded-card p-8">
-                    <p className="text-sm text-elf-muted leading-relaxed mb-3">
-                      Anyone on the team contributes here — devs ship commits,
-                      writers post notes, designers drop refs. Everything lands
-                      in the same audit log, in plain English.
-                    </p>
-                    {!canCommit && (
-                      <p className="text-xs text-elf-muted">
-                        Viewers read but don&apos;t post. Ask a manager to bump
-                        your role if you want to contribute.
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <CommitList commits={commits} authorById={authors} />
+                  <Button
+                    href={`/workspaces/${workspace.codename}/projects/${project.slug}/commits/new`}
+                    variant="secondary"
+                    size="md"
+                  >
+                    Full commit form →
+                  </Button>
                 )}
               </div>
 
-              {role === "manager" && (
-                <SeedDemoButton
-                  codename={workspace.codename}
-                  slug={project.slug}
-                />
-              )}
-
-              {role === "manager" && projectMembers.length > 0 && (
-                <div>
-                  <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-                    <div>
-                      <h2 className="text-lg text-elf-forest">
-                        Project members
-                      </h2>
-                      <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
-                        per-project role overrides · workspace defaults apply otherwise
-                      </p>
-                    </div>
-                  </div>
-                  <ProjectMembersPanel
+              {canCommit && (
+                <div className="mb-5">
+                  <QuickNoteForm
                     codename={workspace.codename}
                     slug={project.slug}
-                    initialMembers={projectMembers}
                   />
                 </div>
               )}
 
-              <div>
-                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-                  <div>
-                    <h2 className="text-lg text-elf-forest">
-                      References &amp; attachments
-                    </h2>
-                    <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
-                      briefs · decks · figma · the original idea
+              {commits.length === 0 ? (
+                <div className="border-hair rounded-card p-8">
+                  <p className="text-sm text-elf-muted leading-relaxed mb-3">
+                    Anyone on the team contributes here — devs ship commits,
+                    writers post notes, designers drop refs. Everything lands
+                    in the same audit log, in plain English.
+                  </p>
+                  {!canCommit && (
+                    <p className="text-xs text-elf-muted">
+                      Viewers read but don&apos;t post. Ask a manager to bump
+                      your role if you want to contribute.
                     </p>
-                  </div>
+                  )}
                 </div>
-                {canCommit && (
-                  <div className="mb-5">
-                    <AttachmentForm
-                      codename={workspace.codename}
-                      slug={project.slug}
-                    />
-                  </div>
-                )}
-                <AttachmentList
-                  codename={workspace.codename}
-                  slug={project.slug}
-                  attachments={projectAttachments}
-                  authorById={authors}
-                  canEdit={canCommit}
-                />
-              </div>
+              ) : (
+                <CommitList commits={commits} authorById={authors} />
+              )}
             </div>
 
-            <aside className="space-y-6">
+            <aside className="space-y-6 lg:sticky lg:top-6 lg:self-start">
               <DetailCard title="Stack">
                 {(project.stack ?? []).length > 0 ? (
                   <div className="flex flex-wrap gap-1.5">
@@ -305,6 +260,64 @@ export default async function ProjectPage({ params }: Props) {
                 </p>
               </DetailCard>
             </aside>
+          </div>
+
+          {/* Full-width section that scrolls past the sticky sidebar. */}
+          <div className="mt-12 space-y-10">
+            {role === "manager" && (
+              <SeedDemoButton
+                codename={workspace.codename}
+                slug={project.slug}
+              />
+            )}
+
+            {role === "manager" && projectMembers.length > 0 && (
+              <div>
+                <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                  <div>
+                    <h2 className="text-lg text-elf-forest">
+                      Project members
+                    </h2>
+                    <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                      per-project role overrides · workspace defaults apply otherwise
+                    </p>
+                  </div>
+                </div>
+                <ProjectMembersPanel
+                  codename={workspace.codename}
+                  slug={project.slug}
+                  initialMembers={projectMembers}
+                />
+              </div>
+            )}
+
+            <div>
+              <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
+                <div>
+                  <h2 className="text-lg text-elf-forest">
+                    References &amp; attachments
+                  </h2>
+                  <p className="mono text-[11px] uppercase tracking-widest text-elf-muted mt-1">
+                    briefs · decks · figma · the original idea
+                  </p>
+                </div>
+              </div>
+              {canCommit && (
+                <div className="mb-5">
+                  <AttachmentForm
+                    codename={workspace.codename}
+                    slug={project.slug}
+                  />
+                </div>
+              )}
+              <AttachmentList
+                codename={workspace.codename}
+                slug={project.slug}
+                attachments={projectAttachments}
+                authorById={authors}
+                canEdit={canCommit}
+              />
+            </div>
           </div>
         </div>
       </section>

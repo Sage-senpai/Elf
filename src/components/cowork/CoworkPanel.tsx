@@ -235,7 +235,7 @@ export function CoworkPanel({ codename, slug, open, onClose }: Props) {
           <button
             type="submit"
             disabled={streaming || !input.trim()}
-            className="shrink-0 inline-flex items-center justify-center h-10 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+            className="shrink-0 inline-flex items-center justify-center h-10 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
           >
             {streaming ? "…" : "Send"}
           </button>
@@ -253,7 +253,7 @@ function Bubble({ message }: { message: Message }) {
         className={cn(
           "max-w-[85%] rounded-card px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-line",
           isUser
-            ? "bg-elf-deep text-elf-warm-white"
+            ? "bg-elf-deep text-elf-on-brand"
             : "bg-elf-warm-white border-hair text-elf-ink"
         )}
       >

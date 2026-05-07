@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { UserMenu } from "@/components/auth/UserMenu";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { MobileMenu } from "./MobileMenu";
 import { cn } from "@/lib/cn";
 
@@ -112,6 +113,7 @@ export function HeaderShell({ user }: Props) {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {user ? (
               <UserMenu user={user} />
             ) : (

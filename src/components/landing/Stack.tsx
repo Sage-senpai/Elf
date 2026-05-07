@@ -29,7 +29,7 @@ const layers: Layer[] = [
 
 export function Stack() {
   return (
-    <section className="bg-elf-forest text-elf-warm-white px-6 py-24">
+    <section className="bg-elf-forest text-elf-on-brand px-6 py-24">
       <div className="mx-auto max-w-shell">
         <div className="mb-16 max-w-prose">
           <p className="mono text-xs uppercase tracking-widest text-elf-mint mb-4">
@@ -38,7 +38,7 @@ export function Stack() {
           <h2 className="display text-4xl md:text-5xl text-elf-mint leading-tight mb-4">
             Infrastructure that outlives the platform.
           </h2>
-          <p className="text-base md:text-lg text-elf-warm-white/80 leading-relaxed">
+          <p className="text-base md:text-lg text-elf-on-brand/80 leading-relaxed">
             Most workspace tools are a single point of failure — if the
             company shuts down, your team&apos;s history shuts down with it.
             Elf is built differently. The parts that matter — your audit log,
@@ -61,13 +61,13 @@ export function Stack() {
               key={layer.title}
               className="border border-hair border-elf-mint/20 rounded-card p-6 md:p-8"
             >
-              <p className="mono text-xs uppercase tracking-widest text-elf-warm-white/60 mb-4">
+              <p className="mono text-xs uppercase tracking-widest text-elf-on-brand/60 mb-4">
                 {layer.layer}
               </p>
               <h3 className="text-xl text-elf-mint mb-3 leading-snug">
                 {layer.title}
               </h3>
-              <p className="text-elf-warm-white/80 leading-relaxed">
+              <p className="text-elf-on-brand/80 leading-relaxed">
                 {layer.body}
               </p>
             </div>

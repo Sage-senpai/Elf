@@ -70,7 +70,7 @@ export function TypeBadge({
       <span
         className={cn(
           "mono text-[11px] uppercase tracking-widest px-2.5 py-1 rounded-badge",
-          breaking ? "bg-elf-deep text-elf-warm-white" : "bg-elf-mint text-elf-forest"
+          breaking ? "bg-elf-deep text-elf-on-brand" : "bg-elf-mint text-elf-forest"
         )}
       >
         {type}

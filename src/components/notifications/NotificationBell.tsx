@@ -144,7 +144,7 @@ export function NotificationBell() {
       >
         <BellIcon />
         {unread > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 mono text-[10px] min-w-[18px] h-[18px] px-1 rounded-full bg-elf-deep text-elf-warm-white flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 mono text-[10px] min-w-[18px] h-[18px] px-1 rounded-full bg-elf-deep text-elf-on-brand flex items-center justify-center">
             {unread > 99 ? "99+" : unread}
           </span>
         )}

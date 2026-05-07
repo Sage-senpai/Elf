@@ -109,8 +109,8 @@ export function ReviewForkButtons({
             onClick={() => review(status.decision)}
             className={
               isApprove
-                ? "inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest"
-                : "inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-ink text-elf-warm-white text-sm hover:bg-black"
+                ? "inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest"
+                : "inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-ink text-elf-on-brand text-sm hover:bg-black"
             }
           >
             {isApprove ? "Yes, approve" : "Yes, reject"}
@@ -141,7 +141,7 @@ export function ReviewForkButtons({
         <button
           type="button"
           onClick={() => setStatus({ kind: "confirm", decision: "approved" })}
-          className="inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest"
+          className="inline-flex items-center justify-center h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest"
         >
           Approve
         </button>

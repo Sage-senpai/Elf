@@ -42,7 +42,7 @@ export function AcceptButton({ token }: { token: string }) {
         type="button"
         onClick={accept}
         disabled={busy}
-        className="h-11 px-5 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+        className="h-11 px-5 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
       >
         {busy ? "Joining…" : "Accept invite"}
       </button>

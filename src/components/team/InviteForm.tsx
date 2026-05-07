@@ -107,7 +107,7 @@ export function InviteForm({
               className={
                 "h-9 px-3 rounded-button text-xs mono uppercase tracking-widest transition-colors " +
                 (role === r
-                  ? "bg-elf-deep text-elf-warm-white"
+                  ? "bg-elf-deep text-elf-on-brand"
                   : "border-hair text-elf-ink hover:bg-elf-warm-white")
               }
             >
@@ -142,7 +142,7 @@ export function InviteForm({
             <button
               type="button"
               onClick={copyLink}
-              className="shrink-0 mono text-[10px] uppercase tracking-widest px-2 py-1.5 rounded-button bg-elf-deep text-elf-warm-white hover:bg-elf-forest"
+              className="shrink-0 mono text-[10px] uppercase tracking-widest px-2 py-1.5 rounded-button bg-elf-deep text-elf-on-brand hover:bg-elf-forest"
             >
               Copy
             </button>
@@ -154,7 +154,7 @@ export function InviteForm({
         <button
           type="submit"
           disabled={submitting || !identifier.trim()}
-          className="h-10 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+          className="h-10 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
         >
           {submitting ? "Sending…" : "Send invite"}
         </button>

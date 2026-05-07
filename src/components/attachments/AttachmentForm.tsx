@@ -76,7 +76,7 @@ export function AttachmentForm({
             className={
               "mono text-[10px] uppercase tracking-widest px-2.5 py-1.5 rounded-badge transition-colors " +
               (type === t.value
-                ? "bg-elf-deep text-elf-warm-white"
+                ? "bg-elf-deep text-elf-on-brand"
                 : "bg-elf-border/40 text-elf-muted hover:bg-elf-border/60")
             }
           >
@@ -109,7 +109,7 @@ export function AttachmentForm({
         <button
           type="submit"
           disabled={busy || !title.trim()}
-          className="h-9 px-4 rounded-button bg-elf-deep text-elf-warm-white text-sm hover:bg-elf-forest disabled:opacity-50"
+          className="h-9 px-4 rounded-button bg-elf-deep text-elf-on-brand text-sm hover:bg-elf-forest disabled:opacity-50"
         >
           {busy ? "Adding…" : "Add reference"}
         </button>
